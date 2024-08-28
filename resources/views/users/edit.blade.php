@@ -9,7 +9,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <form action="{{ route('users.update', $user) }}" method="POST">
+                    <form class="update_confirm" action="{{ route('users.update', $user) }}" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="mb-4">
@@ -44,14 +44,18 @@
                             <label for="password_confirmation" class="block text-gray-700 text-sm font-bold mb-2">パスワード確認:</label>
                             <input type="password" name="password_confirmation" id="password_confirmation" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         </div>
+                        
+                        <div id="error-message" class="text-red-500 text-sm hidden mb-4">パスワードが一致しません。</div>
+                        
                         <div class="flex items-center justify-end gap-4">
-                            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            <button type="button" onclick="validatePassword()" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 更新する
                             </button>
                             <a href="{{ route('users.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                                 戻る
                             </a>
                         </div>
+                        
                     </form>
                 </div>
             </div>
@@ -64,6 +68,18 @@
                 input.type = "text";
             } else {
                 input.type = "password";
+            }
+        }
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+            var confirmPassword = document.getElementById("password_confirmation").value;
+            var errorMessage = document.getElementById("error-message");
+
+            if (password !== confirmPassword) {
+                errorMessage.classList.remove("hidden");
+            } else {
+                errorMessage.classList.add("hidden");
+                document.querySelector(".update_confirm").submit();
             }
         }
         </script>
