@@ -18,3 +18,16 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+
+
+
+
+
+
+
+
+
+// admin使う場合：
+// Route::get('/admin-only', function () {
+// })->middleware('admin');
