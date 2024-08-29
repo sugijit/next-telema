@@ -12,10 +12,13 @@
                 <div class="mx-6 mb-4 border-b border-gray-200 dark:border-gray-700">
                     <ul class="flex flex-wrap  text-sm font-medium text-center">
                         <li class="">
-                            <a href="{{ route('products', ['p' => 'sb']) }}" class="inline-block p-4 border-b-4 rounded-t-lg {{ ($prod_type === 'sb' || $prod_type === null ) ? 'text-blue-600 border-b-blue-600' : 'hover:text-gray-600 hover:border-gray-300' }}">Softbank</a>
+                            <a href="{{ route('products', ['p' => 'sb']) }}" class="inline-block p-4 border-b-4 rounded-t-lg">Softbank</a>
                         </li>
                         <li class="">
-                            <a href="{{ route('products', ['p' => 'au']) }}" class="inline-block p-4 border-b-4 rounded-t-lg {{ $prod_type === 'au' ? 'text-blue-600 border-b-blue-600' : 'hover:text-gray-600 hover:border-gray-300' }}">AU</a>
+                            <a href="{{ route('products', ['p' => 'au']) }}" class="inline-block p-4 border-b-4 rounded-t-lg">AU</a>
+                        </li>
+                        <li class="">
+                            <a href="{{ route('products.add') }}" class="inline-block p-3 border-b-4 rounded-t-lg text-green-500 text-xl"><i class="fa-solid fa-circle-plus"></i></a>
                         </li>
                     </ul>
                 </div>

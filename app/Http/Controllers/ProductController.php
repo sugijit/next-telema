@@ -3,37 +3,38 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Termwind\Components\Raw;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint; 
+
+use function PHPUnit\Framework\isEmpty;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $prod_type = $request->query('p');
-        $products = $this->getProductsByType($prod_type);
-        return view('product.index', compact('products', 'prod_type'));
+        $products = [];
+        if(isEmpty($products)){
+            return view('product.add', compact('products'));
+        }
+        return view('product.index', compact('products'));
     }
 
 
     public function getProductsByType($type)
-{
-        // This is where you'd fetch products based on the type
-        // For now, let's return dummy data
-        if ($type == 'au') {
-            return ['AU Product 1', 'AU Product 2', 'AU Product 3'];
-        } else {
-            return ['Softbank Product 1', 'Softbank Product 2', 'Softbank Product 3'];
-        }
+    {
+
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function add()
     {
-        //
+        return view('product.add');
     }
 
     /**
@@ -75,4 +76,61 @@ class ProductController extends Controller
     {
         //
     }
+
+    public function upload(Request $request) {
+        $request->validate([
+            'csv_file' => 'required|mimes:csv,txt',
+            'table_name' => 'required|string',
+            'product_name' => 'required|string',
+        ]);
+    
+        $table_name = "product_" . $request->input('table_name');
+        $product_name = $request->input('product_name');
+        $file = $request->file('csv_file');
+        $filePath = $file->getRealPath();
+        $csvContent = file_get_contents($filePath);
+        $csvContent = mb_convert_encoding($csvContent, 'UTF-8', 'SJIS');
+        file_put_contents($filePath, $csvContent);
+        $csvFile = fopen($filePath, 'r');
+
+        $header = fgetcsv($csvFile);
+        $rows = [];
+        
+        while (($row = fgetcsv($csvFile)) !== false) {
+            $rows[] = $row;
+        }
+        fclose($csvFile);
+    
+
+
+
+
+        dd($header);
+
+
+
+
+
+
+        $this->createTable($tableName, $translatedHeaders);
+    }
+    
+
+    protected function createTable($tableName, $headers)
+    {
+        Schema::create($tableName, function (Blueprint $table) use ($headers) {
+            $table->id();
+            foreach ($headers as $header) {
+                $table->string($header)->nullable();
+            }
+            $table->timestamps();
+        });
+    }
+
+
+    public function upsert(Request $request) {
+
+    }
+
+
 }

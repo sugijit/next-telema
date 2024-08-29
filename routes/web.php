@@ -20,6 +20,9 @@ Route::middleware('auth')->group(function () {
 
     // 架電リスト
     Route::get('/products/{type?}', [ProductController::class, 'index'])->name('products');
+    Route::get('/products.add}', [ProductController::class, 'add'])->name('products.add');
+    Route::post('/products/upload', [ProductController::class, 'upload'])->name('products.upload');
+
 });
 
 
