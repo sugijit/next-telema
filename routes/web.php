@@ -19,6 +19,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // 架電リスト
+    Route::resource('products', ProductController::class);
     Route::get('/products/{type?}', [ProductController::class, 'index'])->name('products');
     Route::get('/products.add}', [ProductController::class, 'add'])->name('products.add');
     Route::post('/products/upload', [ProductController::class, 'upload'])->name('products.upload');

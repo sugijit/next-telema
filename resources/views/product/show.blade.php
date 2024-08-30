@@ -13,7 +13,7 @@
                     <ul class="flex flex-wrap  text-sm font-medium text-center">
                         @foreach ($products as $product)
                         <li class="">
-                            <a href="{{ route('products', $product['id']) }}" class="inline-block p-4 border-b-4 rounded-t-lg">{{ $product["product_name"] }}</a>
+                            <a href="{{ route('products', $product['id']) }}" class="inline-block p-4 border-b-4 rounded-t-lg {{ ($product['id'] == $id ) ? 'text-blue-600 border-b-blue-600' : 'hover:text-gray-600 hover:border-gray-300' }}">{{ $product["product_name"] }}</a>
                         </li>
                         @endforeach
                         <li class="">

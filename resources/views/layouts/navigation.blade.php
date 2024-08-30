@@ -15,7 +15,7 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('products')" :active="request()->routeIs('products','products.add')">
+                    <x-nav-link :href="route('products')" :active="request()->routeIs('products.index','products.add','products.show')">
                         {{ __('架電リスト') }}
                     </x-nav-link>
                     @if(Auth::user()->role === 'admin')

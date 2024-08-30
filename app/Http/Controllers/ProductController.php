@@ -11,6 +11,8 @@ use Illuminate\Database\QueryException;
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\ProductsMst;
+use Illuminate\Support\Facades\Auth;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -19,14 +21,30 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = [];
+        $id = $request->query('p');
+        // dd($product_id);
+        $products = ProductsMst::all()->toArray();
+        // $products_table = ProductsMst::find($product_id);
 
-        if(isEmpty($products)){
+        // if($products_table['table_name']){
+
+        //     $modelClass = 'App\Models\Product'.ucfirst($products_table['table_name']);
+        //     $records = $modelClass::all();
+    
+        //     dd($records);
+        // }
+
+        // リストない場合、addをみせる
+        if(Empty($products)){
             return view('product.add', compact('products'));
         }
-        return view('product.index', compact('products'));
+        if ($id == null){
+            $id = 1;
+            return view('product.show', compact('products', 'id'));
+        } 
+        return view('product.show', compact('products', 'id'));
     }
 
 
@@ -40,7 +58,8 @@ class ProductController extends Controller
      */
     public function add()
     {
-        return view('product.add');
+        $products = ProductsMst::all()->toArray();
+        return view('product.add', compact('products'));
     }
 
     /**
@@ -54,9 +73,10 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id = "1")
     {
-        //
+        $products = ProductsMst::all()->toArray();
+        return view('product.show', compact('products', 'id'));
     }
 
     /**
@@ -130,12 +150,8 @@ class ProductController extends Controller
         $column_names = array_shift($rows);
         $table_full_columns = array_merge($column_names, $telema_columns);
 
-        // dd($table_full_columns);
 
-        // dd(ucfirst(Str::camel($table_name)));
-    
 
-        // dd($rows);
 
 
         // テーブル作成
@@ -147,11 +163,27 @@ class ProductController extends Controller
 
         try {
             $this->createModel($table_name, $table_full_columns);
-            return back()->with('success', "MODELが正常に作成されました。");
+            
         } catch (Exception $e) {
             return back();
         }
 
+        // products_msts table マスター登録
+        $user = Auth::user();
+        $user_id = $user->id;
+        $validatedData = $request->validate([
+            'product_name' => 'required|string|max:255',
+            'table_name' => 'nullable|string|max:255',
+        ]);
+        $product_mst = new ProductsMst();
+        $product_mst->product_name = $validatedData['product_name'];
+        $product_mst->table_name = $validatedData['table_name'];
+        $product_mst->company_id = $user_id;
+        $product_mst->created_user_id = $user_id;
+        $product_mst->save();
+
+        return redirect()->route('products', ['p' => $product_mst->id])
+            ->with('success', "MODELが正常に作成されました。");
 
         // モデル生成
 

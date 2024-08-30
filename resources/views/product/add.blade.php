@@ -11,12 +11,11 @@
 
                 <div class="mx-6 mb-4 border-b border-gray-200 dark:border-gray-700">
                     <ul class="flex flex-wrap  text-sm font-medium text-center">
-                        {{-- <li class="">
-                            <a href="{{ route('products', ['p' => 'sb']) }}" class="inline-block p-4 border-b-4 rounded-t-lg">Softbank</a>
-                        </li>
+                        @foreach ($products as $product)
                         <li class="">
-                            <a href="{{ route('products', ['p' => 'au']) }}" class="inline-block p-4 border-b-4 rounded-t-lg">AU</a>
-                        </li> --}}
+                            <a href="{{ route('products', $product['id']) }}" class="inline-block p-4 border-b-4 rounded-t-lg">{{ $product["product_name"] }}</a>
+                        </li>
+                        @endforeach
                         <li class="">
                             <a href="{{ route('products.add') }}" class="inline-block p-3 border-b-4 border-b-green-500 rounded-t-lg text-green-500 text-xl"><i class="fa-solid fa-circle-plus"></i></a>
                         </li>
