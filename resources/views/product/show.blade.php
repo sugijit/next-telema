@@ -6,7 +6,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="w-full mx-auto sm:px-6 lg:px-8">
+        <div class="w-full mx-auto sm:px-6 lg:px-8 ">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 
                 <div class="mx-6 mb-4 border-b border-gray-200 dark:border-gray-700">
@@ -28,20 +28,24 @@
                             リスト追加
                         </a>
                     </div>
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-blue-100">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名前</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach ($products as $product)
-                                <tr class="odd:bg-white even:bg-gray-50">
-                                    <td class="px-6 py-2 whitespace-nowrap">{{ $product["product_name"] }}</td>
+                    <div class="overflow-x-scroll">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-blue-100">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名前</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach ($list_items as $list_item)
+                                    <tr class="odd:bg-white even:bg-gray-50">
+                                        @foreach ($list_item as $value)
+                                            <td class="px-6 py-2 whitespace-nowrap text-xs">{{ $value }}</td>
+                                        @endforeach
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

@@ -26,15 +26,6 @@ class ProductController extends Controller
         $id = $request->query('p');
         // dd($product_id);
         $products = ProductsMst::all()->toArray();
-        // $products_table = ProductsMst::find($product_id);
-
-        // if($products_table['table_name']){
-
-        //     $modelClass = 'App\Models\Product'.ucfirst($products_table['table_name']);
-        //     $records = $modelClass::all();
-    
-        //     dd($records);
-        // }
 
         // リストない場合、addをみせる
         if(Empty($products)){
@@ -75,8 +66,19 @@ class ProductController extends Controller
      */
     public function show(string $id = "1")
     {
+        $product_table = ProductsMst::find($id);
+
+        if ($product_table['table_name']){
+            $modelClass = 'App\Models\Product'.ucfirst($product_table['table_name']);
+            $list_items = $modelClass::all()->toArray();
+        } else {
+            $list_items = [];
+        }
+
+        // dd($list_items);
+        
         $products = ProductsMst::all()->toArray();
-        return view('product.show', compact('products', 'id'));
+        return view('product.show', compact('products', 'id', 'list_items'));
     }
 
     /**
@@ -145,7 +147,8 @@ class ProductController extends Controller
         }
         fclose($csvFile);
 
-        $table_name = "product_" . $request->input('table_name');
+        $table_name = "product_" . $request->input('table_name') . 's';
+        $model_name = "product_" . $request->input('table_name');
         $product_name = $request->input('product_name');
         $column_names = array_shift($rows);
         $table_full_columns = array_merge($column_names, $telema_columns);
@@ -160,14 +163,13 @@ class ProductController extends Controller
         } catch (Exception $e) {
             return back();
         }
-
+        // モデル生成
         try {
-            $this->createModel($table_name, $table_full_columns);
+            $this->createModel($model_name, $table_full_columns);
             
         } catch (Exception $e) {
             return back();
         }
-
         // products_msts table マスター登録
         $user = Auth::user();
         $user_id = $user->id;
@@ -182,10 +184,14 @@ class ProductController extends Controller
         $product_mst->created_user_id = $user_id;
         $product_mst->save();
 
-        return redirect()->route('products', ['p' => $product_mst->id])
-            ->with('success', "MODELが正常に作成されました。");
 
-        // モデル生成
+        // CSVデータ挿入
+        $this->insertCsvData($table_name, $column_names, array_slice($rows, 1));
+
+        return redirect()->route('products', ['p' => $product_mst->id])
+            ->with('success', "新規リストがが正常に作成されました。");
+
+  
 
         // Bladeファイル生成
         // $this->generateBlade($filename, $translatedHeaders);
@@ -245,6 +251,17 @@ class ProductController extends Controller
         return;
     }
 
+
+
+    protected function insertCsvData($tableName, $column_names, $rows)
+    {
+        foreach ($rows as $row) {
+            $data = array_combine($column_names, $row);
+
+            // ここで既存のデータがあるかチェックし、なければ挿入、あれば更新
+            DB::table($tableName)->updateOrInsert($data);
+        }
+    }
 
     public function upsert(Request $request) {
 
