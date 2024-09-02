@@ -108,7 +108,7 @@ class ProductController extends Controller
 
 
 
-
+        // dd($list_items);
         // dd($header_jp);
         return view('product.show', compact('products', 'id', 'list_items', 'header_jp'));
     }

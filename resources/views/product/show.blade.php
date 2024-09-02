@@ -44,18 +44,46 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach ($list_items as $list_item)
+                                @foreach ($list_items as $rowIndex => $list_item)
                                     <tr class="odd:bg-white even:bg-gray-50">
-                                        @foreach ($list_item as $value)
-                                            <td class="px-3 py-2 whitespace-nowrap text-xs">{{ $value }}</td>
+                                        @foreach ($list_item as $colIndex => $value)
+                                            <td class="px-3 py-2 whitespace-nowrap text-xs">
+                                                <div id="editable-text-{{ $rowIndex }}-{{ $colIndex }}" class="editable" onclick="makeEditable({{ $rowIndex }}, '{{ $colIndex }}')">
+                                                    {{ $value }}
+                                                </div>
+                                                <input id="editable-input-{{ $rowIndex }}-{{ $colIndex }}" type="text" style="display:none;" value="{{ $value }}" onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')" />
+                                            </td>
                                         @endforeach
                                     </tr>
                                 @endforeach
                             </tbody>
+                            {{-- {{ $list_items->links() }} --}}
                         </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+       function makeEditable(rowIndex, colIndex) {
+            console.log(rowIndex);
+            console.log(colIndex);
+            
+            const textDiv = document.getElementById(`editable-text-${rowIndex}-${colIndex}`);
+            const inputField = document.getElementById(`editable-input-${rowIndex}-${colIndex}`);
+            textDiv.style.display = 'none';
+            inputField.style.display = 'block';
+            inputField.focus();
+        }
+
+        function saveChanges(rowIndex, colIndex) {
+            const textDiv = document.getElementById(`editable-text-${rowIndex}-${colIndex}`);
+            const inputField = document.getElementById(`editable-input-${rowIndex}-${colIndex}`);
+            // const newValue = inputField.value;
+
+            // textDiv.textContent = newValue;
+            textDiv.style.display = 'block';
+            inputField.style.display = 'none';
+        }
+    </script>
 </x-app-layout>
