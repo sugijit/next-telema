@@ -76,6 +76,7 @@ class ProductController extends Controller
         }
         
         $products = ProductsMst::all()->toArray();
+
         $header_jp = $list_items[0]['header'];
         $header_jp = explode(",", $header_jp);
 
@@ -310,6 +311,51 @@ class ProductController extends Controller
 
     public function upsert(Request $request) {
 
+    }
+
+    public function updateCell(Request $request)
+    {
+        try {
+            $rowIndex = $request->input('rowIndex');
+            $colIndex = $request->input('colIndex');
+            $value = $request->input('value');
+            $productId = $request->input('id');
+    
+            if (!$productId) {
+                return response()->json(['success' => false, 'message' => 'Product ID is required'], 400);
+            }
+            $product_table = ProductsMst::find($productId);
+    
+            if (!$product_table) {
+                return response()->json(['success' => false, 'message' => 'Product table not found'], 404);
+            }
+
+            $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']);
+            
+            if (!class_exists($modelClass)) {
+                return response()->json(['success' => false, 'message' => 'Model class not found'], 404);
+            }
+    
+            $products = $modelClass::all();
+    
+            if ($rowIndex >= count($products)) {
+                return response()->json(['success' => false, 'message' => 'Row index out of range'], 400);
+            }
+    
+            $product = $products[$rowIndex];
+    
+            if (!array_key_exists($colIndex, $product->toArray())) {
+                return response()->json(['success' => false, 'message' => 'Column index not found'], 400);
+            }
+    
+            $product[$colIndex] = $value;
+            $product->save();
+    
+            return response()->json(['success' => true]);
+    
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
 

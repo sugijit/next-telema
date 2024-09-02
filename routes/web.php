@@ -24,6 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/products.add}', [ProductController::class, 'add'])->name('products.add');
     Route::post('/products/upload', [ProductController::class, 'upload'])->name('products.upload');
 
+    Route::post('/update-cell', [ProductController::class, 'updateCell'])->name('updateCell');
 });
 
 

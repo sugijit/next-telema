@@ -1,4 +1,5 @@
 <x-app-layout>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('リスト一覧') }}
@@ -49,9 +50,9 @@
                                         @foreach ($list_item as $colIndex => $value)
                                             <td class="px-3 py-2 whitespace-nowrap text-xs">
                                                 <div id="editable-text-{{ $rowIndex }}-{{ $colIndex }}" class="editable" onclick="makeEditable({{ $rowIndex }}, '{{ $colIndex }}')">
-                                                    {{ $value }}
+                                                    {{ $value == null ? '-' : $value }}
                                                 </div>
-                                                <input id="editable-input-{{ $rowIndex }}-{{ $colIndex }}" type="text" style="display:none;" value="{{ $value }}" onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')" />
+                                                <input class="text-xs px-2 py-1" id="editable-input-{{ $rowIndex }}-{{ $colIndex }}" type="text" style="display:none;" value="{{ $value }}" onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')" />
                                             </td>
                                         @endforeach
                                     </tr>
@@ -77,13 +78,49 @@
         }
 
         function saveChanges(rowIndex, colIndex) {
+            const id = "{{ $id }}";
             const textDiv = document.getElementById(`editable-text-${rowIndex}-${colIndex}`);
             const inputField = document.getElementById(`editable-input-${rowIndex}-${colIndex}`);
-            // const newValue = inputField.value;
+            const newValue = inputField.value;
 
-            // textDiv.textContent = newValue;
-            textDiv.style.display = 'block';
-            inputField.style.display = 'none';
+            // データをサーバーに送信
+            fetch('/update-cell', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    rowIndex: rowIndex,
+                    colIndex: colIndex,
+                    value: newValue,
+                    id: id,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (newValue == null || newValue == "" || newValue == " " || newValue == "　") {
+                        textDiv.textContent = "-";
+                    } else {
+                        textDiv.textContent = newValue;
+                    }
+                } else {
+                    alert('変更の保存に失敗しました');
+                }
+                textDiv.style.display = 'block';
+                inputField.style.display = 'none';
+                if(newValue == null || newValue == "") {
+                    textDiv.value = "-";
+                }
+
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('エラーが発生しました');
+                textDiv.style.display = 'block';
+                inputField.style.display = 'none';
+            });
         }
     </script>
 </x-app-layout>
