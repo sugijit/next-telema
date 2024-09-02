@@ -29,9 +29,9 @@
                             リスト追加
                         </a>
                     </div>
-                    <div class="overflow-x-scroll">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-blue-100">
+                    <div class="overflow-scroll !h-[500px]">
+                        <table class="min-w-full divide-y divide-gray-200 ">
+                            <thead class="bg-blue-100 sticky top-0">
                                 <tr>
                                     @foreach($header_jp as $header)
                                         {{-- 幅小さいもの　そのまま --}}
@@ -48,14 +48,28 @@
                                 @foreach ($list_items as $rowIndex => $list_item)
                                     <tr class="odd:bg-white even:bg-gray-50">
                                         @foreach ($list_item as $colIndex => $value)
-                                            <td class="px-3 py-2 whitespace-nowrap text-xs">
+                                        @if (Str::startsWith($colIndex, "telema"))
+                                            <td class="px-3 py-2 whitespace-nowrap bg-green-50 text-xs">
+                                        @else
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs">
+                                        @endif
                                                 @if (Str::startsWith($colIndex, "telema"))
-                                                    <div id="editable-text-{{ $rowIndex }}-{{ $colIndex }}" class="editable" onclick="makeEditable({{ $rowIndex }}, '{{ $colIndex }}')">
+                                                    <div id="editable-text-{{ $rowIndex }}-{{ $colIndex }}" class="editable p-0" onclick="makeEditable({{ $rowIndex }}, '{{ $colIndex }}')">
                                                         {{ $value == null ? '-' : $value }}
                                                     </div>
                                                 @else
                                                     <div>
-                                                        {{ $value == null ? '-' : $value }}
+                                                        @php
+                                                            $phoneRegex = '/^(\d{2,4}-\d{2,4}-\d{4}|\d{10,11})$/';
+                                                            $isValidPhoneNumber = preg_match($phoneRegex, $value);
+                                                        @endphp
+
+                                                        @if ($isValidPhoneNumber)
+                                                            <a href="tel:{{$value}}">{{ $value == null ? '-' : $value }}</a> 
+                                                        @else
+                                                            {{ $value == null ? '-' : $value }}
+                                                        @endif
+                                                       
                                                     </div>
                                                 @endif
                                                 <input class="text-xs px-2 py-1" id="editable-input-{{ $rowIndex }}-{{ $colIndex }}" type="text" style="display:none;" value="{{ $value }}" onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')" />
