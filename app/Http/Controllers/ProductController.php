@@ -76,7 +76,41 @@ class ProductController extends Controller
         }
         
         $products = ProductsMst::all()->toArray();
-        return view('product.show', compact('products', 'id', 'list_items'));
+        $header_jp = $list_items[0]['header'];
+        $header_jp = explode(",", $header_jp);
+
+        foreach($list_items as &$list_item) {
+            unset($list_item["header"]);
+        }
+        unset($list_item);
+
+        $telema_column_jp = [
+            'telema_call_date' => '架電日',
+            'telema_result' => '結果',
+            'telema_call_user_name' => '架電担当者',
+            'telema_call_count' => '架電回数',
+            'telema_atokaku' => 'アトカク',
+            'telema_call_plan_date' => '再架電予定、状況',
+            'telema_service_now' => '現利用サービス',
+            'telema_acq_server' => '獲得サーバー',
+            'telema_server_size' => 'サイズ',
+            'telema_server_color' => '色',
+            'telema_mail' => 'メールアドレス',
+            'telema_arrival_date' => '配送日',
+            'telema_arrival_time' => '到着時間',
+            'telema_benefits' => '補償優待',
+        ];
+
+        $header_jp = array_merge($header_jp, $telema_column_jp);
+        array_unshift($header_jp, "id");
+        $last_two = ['反映日', '変更日'];
+        array_push($header_jp, ...$last_two);
+
+
+
+
+        // dd($header_jp);
+        return view('product.show', compact('products', 'id', 'list_items', 'header_jp'));
     }
 
     /**
@@ -105,6 +139,7 @@ class ProductController extends Controller
 
     public function upload(Request $request) {
 
+        //テレマリストの後ろの列　※ここ変えたら必ず show()の配列も変更するように！！！
         $telema_columns = [
             'telema_call_date',
             'telema_result',
@@ -133,26 +168,36 @@ class ProductController extends Controller
         $file = $request->file('csv_file');
         $filePath = $file->getRealPath();
         $csvContent = file_get_contents($filePath);
-        $csvContent = mb_convert_encoding($csvContent, 'UTF-8', 'SJIS');
+        $encoding = mb_detect_encoding($csvContent, ['UTF-8', 'SJIS', 'EUC-JP']);
+        if ($encoding != "UTF-8") {
+            $csvContent = mb_convert_encoding($csvContent, 'UTF-8', 'SJIS');
+        }
+        // dd($encoding);
         file_put_contents($filePath, $csvContent);
         $csvFile = fopen($filePath, 'r');
 
         $header = fgetcsv($csvFile);
+        $header_to_text = implode(',', $header);
         $rows = [];
         
         while (($row = fgetcsv($csvFile)) !== false) {
+            $row["header"] = $header_to_text;
             $rows[] = $row;
         }
+        // dd($rows);
         fclose($csvFile);
+        $table = str_replace(' ', '', $request->input('table_name'));
+        $table = strtolower($table);
 
-        $table_name = "product_" . $request->input('table_name') . 's';
-        $model_name = "product_" . $request->input('table_name');
+        $table_name = "product_" .$table . 's';
+        $model_name = "product_" . ucfirst($table);
         $product_name = $request->input('product_name');
         $column_names = array_shift($rows);
+        $column_names['header'] = "header";
         $table_full_columns = array_merge($column_names, $telema_columns);
 
 
-
+        // dd($rows);
 
 
         // テーブル作成
@@ -181,6 +226,7 @@ class ProductController extends Controller
         $product_mst->company_id = $user_id;
         $product_mst->created_user_id = $user_id;
         $product_mst->save();
+        // dd($rows);
 
 
         // CSVデータ挿入
@@ -253,6 +299,7 @@ class ProductController extends Controller
 
     protected function insertCsvData($tableName, $column_names, $rows)
     {
+        // dd(count($rows[0]));
         foreach ($rows as $row) {
             $data = array_combine($column_names, $row);
 

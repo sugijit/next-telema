@@ -46,7 +46,7 @@
                                         </div>
                                     </div>
                                 </label>
-                                <input type="text" name="table_name" placeholder="例：softbank" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                                <input type="text" id="table_name" name="table_name" placeholder="例：softbank" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
                             </div>
                             <div class="text-right">
                                 <button type="submit" class="mt-12 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
@@ -71,5 +71,9 @@
             tooltip.style.opacity = '0';
             tooltip.style.pointerEvents = 'none';
         }
+
+        document.getElementById('table_name').addEventListener('input', function() {
+            this.value = this.value.replace(/\s+/g, '');
+        });
     </script>
 </x-app-layout>

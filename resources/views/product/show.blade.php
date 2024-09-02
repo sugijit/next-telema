@@ -32,14 +32,22 @@
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-blue-100">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名前</th>
+                                    @foreach($header_jp as $header)
+                                        {{-- 幅小さいもの　そのまま --}}
+                                        @if($header == "id" || $header == "ids" || $header == "server_color")
+                                            <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase">{{$header}}</th>
+                                        {{-- ちょっと広く見せたい --}}
+                                        @else  
+                                            <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase min-w-24">{{$header}}</th>
+                                        @endif
+                                    @endforeach
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach ($list_items as $list_item)
                                     <tr class="odd:bg-white even:bg-gray-50">
                                         @foreach ($list_item as $value)
-                                            <td class="px-6 py-2 whitespace-nowrap text-xs">{{ $value }}</td>
+                                            <td class="px-3 py-2 whitespace-nowrap text-xs">{{ $value }}</td>
                                         @endforeach
                                     </tr>
                                 @endforeach
