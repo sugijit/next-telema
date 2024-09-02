@@ -23,19 +23,14 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $id = $request->query('p');
-        // dd($product_id);
         $products = ProductsMst::all()->toArray();
 
         // リストない場合、addをみせる
-        if(Empty($products)){
+        if (Empty($products)){
             return view('product.add', compact('products'));
-        }
-        if ($id == null){
-            $id = 1;
-            return view('product.show', compact('products', 'id'));
+        } else {
+            return redirect()->route('products.show', 1);
         } 
-        return view('product.show', compact('products', 'id'));
     }
 
 
@@ -64,18 +59,21 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id = "1")
+    public function show(string $id)
     {
+
         $product_table = ProductsMst::find($id);
 
-        if ($product_table['table_name']){
-            $modelClass = 'App\Models\Product'.ucfirst($product_table['table_name']);
-            $list_items = $modelClass::all()->toArray();
+        if($product_table) {
+            if ($product_table['table_name']){
+                $modelClass = 'App\Models\Product'.ucfirst($product_table['table_name']);
+                $list_items = $modelClass::all()->toArray();
+            } 
         } else {
+            $products = ProductsMst::all()->toArray();
             $list_items = [];
+            return view('product.add', compact('products'));
         }
-
-        // dd($list_items);
         
         $products = ProductsMst::all()->toArray();
         return view('product.show', compact('products', 'id', 'list_items'));
@@ -188,7 +186,7 @@ class ProductController extends Controller
         // CSVデータ挿入
         $this->insertCsvData($table_name, $column_names, array_slice($rows, 1));
 
-        return redirect()->route('products', ['p' => $product_mst->id])
+        return redirect()->route('products.show', $product_mst->id)
             ->with('success', "新規リストがが正常に作成されました。");
 
   
