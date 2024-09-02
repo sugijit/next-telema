@@ -49,9 +49,15 @@
                                     <tr class="odd:bg-white even:bg-gray-50">
                                         @foreach ($list_item as $colIndex => $value)
                                             <td class="px-3 py-2 whitespace-nowrap text-xs">
-                                                <div id="editable-text-{{ $rowIndex }}-{{ $colIndex }}" class="editable" onclick="makeEditable({{ $rowIndex }}, '{{ $colIndex }}')">
-                                                    {{ $value == null ? '-' : $value }}
-                                                </div>
+                                                @if (Str::startsWith($colIndex, "telema"))
+                                                    <div id="editable-text-{{ $rowIndex }}-{{ $colIndex }}" class="editable" onclick="makeEditable({{ $rowIndex }}, '{{ $colIndex }}')">
+                                                        {{ $value == null ? '-' : $value }}
+                                                    </div>
+                                                @else
+                                                    <div>
+                                                        {{ $value == null ? '-' : $value }}
+                                                    </div>
+                                                @endif
                                                 <input class="text-xs px-2 py-1" id="editable-input-{{ $rowIndex }}-{{ $colIndex }}" type="text" style="display:none;" value="{{ $value }}" onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')" />
                                             </td>
                                         @endforeach
