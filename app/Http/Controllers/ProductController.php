@@ -106,10 +106,8 @@ class ProductController extends Controller
         $last_two = ['反映日', '変更日'];
         array_push($header_jp, ...$last_two);
 
+        $can_views = json_decode($current_list["view"], TRUE);
 
-
-        // dd($list_items);
-        // dd($header_jp);
         return view('product.show', compact('products', 'id', 'list_items', 'header_jp', 'current_list'));
     }
 
@@ -173,7 +171,7 @@ class ProductController extends Controller
         if ($encoding != "UTF-8") {
             $csvContent = mb_convert_encoding($csvContent, 'UTF-8', 'SJIS');
         }
-        // dd($encoding);
+
         file_put_contents($filePath, $csvContent);
         $csvFile = fopen($filePath, 'r');
 
@@ -185,7 +183,8 @@ class ProductController extends Controller
             $row["header"] = $header_to_text;
             $rows[] = $row;
         }
-        // dd($rows);
+
+
         fclose($csvFile);
         $table = str_replace(' ', '', $request->input('table_name'));
         $table = strtolower($table);
@@ -197,8 +196,17 @@ class ProductController extends Controller
         $column_names['header'] = "header";
         $table_full_columns = array_merge($column_names, $telema_columns);
 
-
-        // dd($rows);
+        // 表示非表示用に生成 productsmstsに登録
+        $product_mst_view = $table_full_columns;
+        array_unshift($product_mst_view, "id");
+        $last_two_date = ['created_at', 'updated_at'];
+        array_push($product_mst_view, ...$last_two_date);
+        unset($product_mst_view["header"]);
+        foreach ($product_mst_view as $keys => $view) {
+            unset($product_mst_view[$keys]);
+            $product_mst_view[$view] = 1;
+        }
+        $product_mst_view = json_encode($product_mst_view);
 
 
         // テーブル作成
@@ -225,8 +233,8 @@ class ProductController extends Controller
         $product_mst->table_name = $validatedData['table_name'];
         $product_mst->company_id = $user_id;
         $product_mst->created_user_id = $user_id;
+        $product_mst->view = $product_mst_view;
         $product_mst->save();
-        // dd($rows);
 
 
         // CSVデータ挿入
@@ -234,15 +242,6 @@ class ProductController extends Controller
 
         return redirect()->route('products.show', $product_mst->id)
             ->with('success', "新規リストがが正常に作成されました。");
-
-
-
-        // Bladeファイル生成
-        // $this->generateBlade($filename, $translatedHeaders);
-        // CSVデータ挿入
-        // $this->insertCsvData($filename, $translatedHeaders, array_slice($csvData, 1));
-        // return back()->with('success', 'CSVファイルをアップロードし、テーブル・モデル・Bladeを生成しました。');
-
     }
 
 
