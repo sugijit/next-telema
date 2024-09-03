@@ -6,7 +6,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-3">
         <div class="w-full mx-auto sm:px-6 lg:px-8 ">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 
@@ -23,13 +23,9 @@
                     </ul>
                 </div>
 
-                <div class="p-6 bg-white border-b border-gray-200">
-                    <div class="mb-6 text-right">
-                        <a href="#" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                            リスト追加
-                        </a>
-                    </div>
-                    <div class="overflow-scroll !h-[500px]">
+                <div class="p-6 !pt-0 bg-white border-b border-gray-200">
+                    
+                    <div class="overflow-scroll !h-[650px]">
                         <table class="min-w-full divide-y divide-gray-200 ">
                             <thead class="bg-blue-100 sticky top-0">
                                 <tr>

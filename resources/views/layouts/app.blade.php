@@ -16,6 +16,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
+        <style>header h2{font-size: 1rem !important}</style>
     </head>
         <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100">
@@ -24,7 +25,7 @@
             <!-- Page Heading -->
             @isset($header)
                 <header class="bg-white shadow">
-                    <div class="w-full mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                    <div class="w-full mx-auto py-4 px-4 sm:px-6 lg:px-8 !text-xs">
                         {{ $header }}
                     </div>
                 </header>
