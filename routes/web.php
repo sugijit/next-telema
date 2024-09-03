@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/upload', [ProductController::class, 'upload'])->name('products.upload');
 
     Route::post('/update-cell', [ProductController::class, 'updateCell'])->name('updateCell');
+    Route::post('/product/can-view', [ProductController::class, 'canView'])->name('product.canView');
 });
 
 
@@ -36,7 +37,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 
 

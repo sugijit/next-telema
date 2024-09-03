@@ -16,14 +16,16 @@
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h2 class="text-sm font-bold mt-3 !mb-6 border-b pb-3 text-gray-600">{{$current_list['product_name']}}</h2>
-            <form id="settingsForm">
-                <div class="grid grid-cols-2 gap-x-16">
-                    @foreach($header_jp as $key => $header)
+            <form id="settingsForm" action="{{ route('product.canView') }}" method="POST">
+                @csrf
+                <div class="grid grid-cols-3 gap-x-16">
+                    <input type="text" value={{$id}} class="hidden" name="product_id">
+                    @foreach($hard_header as $key => $head)
                         <div class="mb-1 flex text-xs">
-                            <label class="block text-sm font-medium min-w-[120px]">{{ $header }}</label>
+                            <label class="block text-sm font-medium min-w-[120px]">{{ $head }}</label>
                             <div class="flex modal">
-                                <input type="radio" name="{{ $key }}" value="1" class="modal-check-show mr-2 transform scale-[80%]">
-                                <input type="radio" name="{{ $key }}" value="0" class="modal-check-hide mr-2 transform scale-[80%]">
+                                <input type="radio" name="{{ $key }}" value="1" class="modal-check-show mr-2 transform scale-[80%]" {{ isset($view_settings[$key]) && $view_settings[$key] == 1 ? 'checked' : ''}}>
+                                <input type="radio" name="{{ $key }}" value="0" class="modal-check-hide mr-2 transform scale-[80%]" {{ isset($view_settings[$key]) && $view_settings[$key] == 0 ? 'checked' : ''}}>
                             </div>
                         </div>
                     @endforeach
@@ -71,13 +73,13 @@
                         <table class="min-w-full divide-y divide-gray-200 ">
                             <thead class="bg-blue-100 sticky top-0">
                                 <tr>
-                                    @foreach($header_jp as $header)
+                                    @foreach($header as $head)
                                         {{-- 幅小さいもの　そのまま --}}
-                                        @if($header == "id" || $header == "ids" || $header == "server_color")
-                                            <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase" ondblclick="resizeTable()">{{$header}}</th>
+                                        @if($head == "id" || $head == "ids" || $head == "server_color")
+                                            <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase" ondblclick="resizeTable()">{{$head}}</th>
                                         {{-- ちょっと広く見せたい --}}
                                         @else  
-                                            <th class="px-3 py-3 w-full text-left text-xs font-medium text-gray-500 uppercase min-w-24" ondblclick="resizeTable()">{{$header}}</th>
+                                            <th class="px-3 py-3 w-full text-left text-xs font-medium text-gray-500 uppercase min-w-24" ondblclick="resizeTable()">{{$head}}</th>
                                         @endif
                                     @endforeach
                                 </tr>

@@ -65,7 +65,7 @@ class ProductController extends Controller
             if ($product_table['table_name']) {
                 $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']);
                 $list_items = $modelClass::all()->toArray();
-                $current_list = ProductsMst::find($id)->toArray();
+                $current_list = $product_table->toArray();
             }
         } else {
             $products = ProductsMst::all()->toArray();
@@ -76,39 +76,25 @@ class ProductController extends Controller
 
         $products = ProductsMst::all()->toArray();
 
-        $header_jp = $list_items[0]['header'];
-        $header_jp = explode(",", $header_jp);
-
-        foreach ($list_items as &$list_item) {
-            unset($list_item["header"]);
-        }
-        unset($list_item);
-
-        $telema_column_jp = [
-            'telema_call_date' => '架電日',
-            'telema_result' => '結果',
-            'telema_call_user_name' => '架電担当者',
-            'telema_call_count' => '架電回数',
-            'telema_atokaku' => 'アトカク',
-            'telema_call_plan_date' => '再架電予定、状況',
-            'telema_service_now' => '現利用サービス',
-            'telema_acq_server' => '獲得サーバー',
-            'telema_server_size' => 'サイズ',
-            'telema_server_color' => '色',
-            'telema_mail' => 'メールアドレス',
-            'telema_arrival_date' => '配送日',
-            'telema_arrival_time' => '到着時間',
-            'telema_benefits' => '補償優待',
-        ];
-
-        $header_jp = array_merge($header_jp, $telema_column_jp);
-        array_unshift($header_jp, "id");
-        $last_two = ['反映日', '変更日'];
-        array_push($header_jp, ...$last_two);
-
         $can_views = json_decode($current_list["view"], TRUE);
+        $view_settings = json_decode($current_list["view"], TRUE);
+        $header = json_decode($current_list["header"], TRUE);
+        $hard_header = json_decode($current_list["header"], TRUE);
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header_jp', 'current_list'));
+        foreach ($can_views as $key => $can_view) {
+            if ($can_view == 0) {
+                unset($header[$key]);
+                foreach ($list_items as $a => &$item) {
+                    unset($item[$key]);
+                }
+                unset($item);
+            }
+        }
+        // dd($header);
+
+        // dd($list_items);
+
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header'));
     }
 
     /**
@@ -139,22 +125,23 @@ class ProductController extends Controller
     {
 
         //テレマリストの後ろの列　※ここ変えたら必ず show()の配列も変更するように！！！
-        $telema_columns = [
-            'telema_call_date',
-            'telema_result',
-            'telema_call_user_name',
-            'telema_call_count',
-            'telema_atokaku',
-            'telema_call_plan_date',
-            'telema_service_now',
-            'telema_acq_server',
-            'telema_server_size',
-            'telema_server_color',
-            'telema_mail',
-            'telema_arrival_date',
-            'telema_arrival_time',
-            'telema_benefits',
+        $telema_columns_eng_jp = [
+            'telema_call_date' => '架電日',
+            'telema_result' => '結果',
+            'telema_call_user_name' => '架電担当者',
+            'telema_call_count' => '架電回数',
+            'telema_atokaku' => 'アトカク',
+            'telema_call_plan_date' => '再架電予定、状況',
+            'telema_service_now' => '現利用サービス',
+            'telema_acq_server' => '獲得サーバー',
+            'telema_server_size' => 'サイズ',
+            'telema_server_color' => '色',
+            'telema_mail' => 'メールアドレス',
+            'telema_arrival_date' => '配送日',
+            'telema_arrival_time' => '到着時間',
+            'telema_benefits' => '補償優待',
         ];
+        $telema_columns = array_flip($telema_columns_eng_jp);
 
 
         $request->validate([
@@ -176,11 +163,10 @@ class ProductController extends Controller
         $csvFile = fopen($filePath, 'r');
 
         $header = fgetcsv($csvFile);
-        $header_to_text = implode(',', $header);
+        // $header_to_text = implode(',', $header);
         $rows = [];
 
         while (($row = fgetcsv($csvFile)) !== false) {
-            $row["header"] = $header_to_text;
             $rows[] = $row;
         }
 
@@ -192,8 +178,9 @@ class ProductController extends Controller
         $table_name = "product_" . $table . 's';
         $model_name = "product_" . ucfirst($table);
         $product_name = $request->input('product_name');
+        $uploaded_header_eng = $rows[0];
         $column_names = array_shift($rows);
-        $column_names['header'] = "header";
+        // $column_names['header'] = "header";
         $table_full_columns = array_merge($column_names, $telema_columns);
 
         // 表示非表示用に生成 productsmstsに登録
@@ -201,12 +188,22 @@ class ProductController extends Controller
         array_unshift($product_mst_view, "id");
         $last_two_date = ['created_at', 'updated_at'];
         array_push($product_mst_view, ...$last_two_date);
-        unset($product_mst_view["header"]);
         foreach ($product_mst_view as $keys => $view) {
             unset($product_mst_view[$keys]);
             $product_mst_view[$view] = 1;
         }
         $product_mst_view = json_encode($product_mst_view);
+
+
+        // 表示非表示用にヘッダーをeng-to-jp生成 productsmstsに登録
+        $full_header_eng_jp_arr['id'] = 'id';
+        $last_two_header_eng_jp_arr['created_at'] = '反映日';
+        $last_two_header_eng_jp_arr['updated_at'] = '更新日';
+        $term_header = array_combine($uploaded_header_eng, $header);
+        $full_header_eng_jp_arr = array_merge($full_header_eng_jp_arr, $term_header);
+        $full_header_eng_jp_arr = array_merge($full_header_eng_jp_arr, $telema_columns_eng_jp);
+        $full_header_eng_jp_arr = array_merge($full_header_eng_jp_arr, $last_two_header_eng_jp_arr);
+        $full_header_eng_jp_arr = json_encode($full_header_eng_jp_arr);
 
 
         // テーブル作成
@@ -234,6 +231,7 @@ class ProductController extends Controller
         $product_mst->company_id = $user_id;
         $product_mst->created_user_id = $user_id;
         $product_mst->view = $product_mst_view;
+        $product_mst->header = $full_header_eng_jp_arr;
         $product_mst->save();
 
 
@@ -351,5 +349,18 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    public function canView(Request $request)
+    {
+        $product_id = $request->input('product_id');
+        $product = ProductsMst::find($product_id);
+
+        $posted_data = $request->input();
+        $update_data = array_slice($posted_data, 2);
+        $update_data = json_encode($update_data);
+        $product->view = $update_data;
+        $product->save();
+        return redirect()->route('products.show', $product->id);
     }
 }
