@@ -18,7 +18,7 @@
         <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.js"></script>
         <style>header h2{font-size: 1rem !important}</style>
     </head>
-        <body class="font-sans antialiased">
+        <body class="font-sans antialiased relative">
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
 

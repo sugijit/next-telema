@@ -1,10 +1,46 @@
 <x-app-layout>
+    {{-- モーダル --}}
+    <style>
+        .modal-check-show:checked, .modal-check-show:focus {
+            background-color: #059e52;
+            border-color: #059e52;
+        }
+        .modal-check-hide:checked, .modal-check-hide:focus {
+            background-color: #f63b57;
+            border-color: #f63b57;
+        }
+    </style>
+    <div id="settingsModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]" onclick="closeModal(event)"> <!-- hidden nemeh-->
+        <div class="bg-white p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="text-xl absolute top-3 right-6 text-gray-500 hover:text-gray-700">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h2 class="text-sm font-bold mt-3 !mb-6 border-b pb-3 text-gray-600">{{$current_list['product_name']}}</h2>
+            <form id="settingsForm">
+                <div class="grid grid-cols-2 gap-x-16">
+                    @foreach($header_jp as $key => $header)
+                        <div class="mb-1 flex text-xs">
+                            <label class="block text-sm font-medium min-w-[120px]">{{ $header }}</label>
+                            <div class="flex modal">
+                                <input type="radio" name="{{ $key }}" value="1" class="modal-check-show mr-2 transform scale-[80%]">
+                                <input type="radio" name="{{ $key }}" value="0" class="modal-check-hide mr-2 transform scale-[80%]">
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="text-center text-sm mt-8">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">保存</button>
+                    <button type="button" onclick="closeModal()" class="ml-2 bg-gray-300 py-2 px-4 rounded">キャンセル</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <x-slot name="header">
+    {{-- <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('リスト一覧') }}
         </h2>
-    </x-slot>
+    </x-slot> --}}
 
     <div class="py-3">
         <div class="w-full mx-auto sm:px-6 lg:px-8 ">
@@ -24,7 +60,13 @@
                 </div>
 
                 <div class="p-6 !pt-0 bg-white border-b border-gray-200">
-                    
+                    <div class="mb-4 flex justify-end gap-3">
+                        {{-- <a href="#" class="text-sm bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            リスト追加
+                        </a> --}}
+                        <button id="settings_button" onclick="openModal()"><i class="text-sm fa-solid fa-gear text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示設定</i></button>
+                    </div>
+
                     <div class="overflow-scroll !h-[650px]">
                         <table class="min-w-full divide-y divide-gray-200 ">
                             <thead class="bg-blue-100 sticky top-0">
@@ -32,10 +74,10 @@
                                     @foreach($header_jp as $header)
                                         {{-- 幅小さいもの　そのまま --}}
                                         @if($header == "id" || $header == "ids" || $header == "server_color")
-                                            <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase">{{$header}}</th>
+                                            <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase" ondblclick="resizeTable()">{{$header}}</th>
                                         {{-- ちょっと広く見せたい --}}
                                         @else  
-                                            <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase min-w-24">{{$header}}</th>
+                                            <th class="px-3 py-3 w-full text-left text-xs font-medium text-gray-500 uppercase min-w-24" ondblclick="resizeTable()">{{$header}}</th>
                                         @endif
                                     @endforeach
                                 </tr>
@@ -137,6 +179,21 @@
                 textDiv.style.display = 'block';
                 inputField.style.display = 'none';
             });
+        }
+        function resizeTable() {
+            console.log('aaa');
+        }
+
+
+        function openModal() {
+            document.getElementById('settingsModal').classList.remove('hidden');
+        }
+
+        function closeModal(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            document.getElementById('settingsModal').classList.add('hidden');
         }
     </script>
 </x-app-layout>
