@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Termwind\Components\Raw;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint; 
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\QueryException;
 use Exception;
@@ -26,18 +26,15 @@ class ProductController extends Controller
         $products = ProductsMst::all()->toArray();
 
         // リストない場合、addをみせる
-        if (Empty($products)){
+        if (empty($products)) {
             return view('product.add', compact('products'));
         } else {
             return redirect()->route('products.show', 1);
-        } 
+        }
     }
 
 
-    public function getProductsByType($type)
-    {
-
-    }
+    public function getProductsByType($type) {}
 
     /**
      * Show the form for creating a new resource.
@@ -64,23 +61,25 @@ class ProductController extends Controller
 
         $product_table = ProductsMst::find($id);
 
-        if($product_table) {
-            if ($product_table['table_name']){
-                $modelClass = 'App\Models\Product'.ucfirst($product_table['table_name']);
+        if ($product_table) {
+            if ($product_table['table_name']) {
+                $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']);
                 $list_items = $modelClass::all()->toArray();
-            } 
+                $current_list = ProductsMst::find($id)->toArray();
+            }
         } else {
             $products = ProductsMst::all()->toArray();
             $list_items = [];
-            return view('product.add', compact('products'));
+            $current_list = [];
+            return view('product.add', compact('products', 'current_list'));
         }
-        
+
         $products = ProductsMst::all()->toArray();
 
         $header_jp = $list_items[0]['header'];
         $header_jp = explode(",", $header_jp);
 
-        foreach($list_items as &$list_item) {
+        foreach ($list_items as &$list_item) {
             unset($list_item["header"]);
         }
         unset($list_item);
@@ -111,7 +110,7 @@ class ProductController extends Controller
 
         // dd($list_items);
         // dd($header_jp);
-        return view('product.show', compact('products', 'id', 'list_items', 'header_jp'));
+        return view('product.show', compact('products', 'id', 'list_items', 'header_jp', 'current_list'));
     }
 
     /**
@@ -138,7 +137,8 @@ class ProductController extends Controller
         //
     }
 
-    public function upload(Request $request) {
+    public function upload(Request $request)
+    {
 
         //テレマリストの後ろの列　※ここ変えたら必ず show()の配列も変更するように！！！
         $telema_columns = [
@@ -164,7 +164,7 @@ class ProductController extends Controller
             'table_name' => 'required|string',
             'product_name' => 'required|string',
         ]);
-    
+
 
         $file = $request->file('csv_file');
         $filePath = $file->getRealPath();
@@ -180,7 +180,7 @@ class ProductController extends Controller
         $header = fgetcsv($csvFile);
         $header_to_text = implode(',', $header);
         $rows = [];
-        
+
         while (($row = fgetcsv($csvFile)) !== false) {
             $row["header"] = $header_to_text;
             $rows[] = $row;
@@ -190,7 +190,7 @@ class ProductController extends Controller
         $table = str_replace(' ', '', $request->input('table_name'));
         $table = strtolower($table);
 
-        $table_name = "product_" .$table . 's';
+        $table_name = "product_" . $table . 's';
         $model_name = "product_" . ucfirst($table);
         $product_name = $request->input('product_name');
         $column_names = array_shift($rows);
@@ -210,7 +210,6 @@ class ProductController extends Controller
         // モデル生成
         try {
             $this->createModel($model_name, $table_full_columns);
-            
         } catch (Exception $e) {
             return back();
         }
@@ -236,16 +235,16 @@ class ProductController extends Controller
         return redirect()->route('products.show', $product_mst->id)
             ->with('success', "新規リストがが正常に作成されました。");
 
-  
+
 
         // Bladeファイル生成
         // $this->generateBlade($filename, $translatedHeaders);
         // CSVデータ挿入
         // $this->insertCsvData($filename, $translatedHeaders, array_slice($csvData, 1));
         // return back()->with('success', 'CSVファイルをアップロードし、テーブル・モデル・Bladeを生成しました。');
-        
+
     }
-    
+
 
     protected function createTable($table_name, $column_names, $telema_columns)
     {
@@ -255,7 +254,7 @@ class ProductController extends Controller
                 throw new Exception("テーブル {$table_name} は既に存在しています。");
                 return false;
             }
-            Schema::create($table_name, function (Blueprint $table) use ($column_names,$telema_columns) {
+            Schema::create($table_name, function (Blueprint $table) use ($column_names, $telema_columns) {
                 $table->id();
                 foreach ($column_names as $column_name) {
                     $table->string($column_name)->nullable();
@@ -281,9 +280,9 @@ class ProductController extends Controller
         $modelName = ucfirst(Str::camel($tableName));
 
         Artisan::call('make:model', ['name' => $modelName]);
-    
+
         $modelPath = app_path("Models/{$modelName}.php");
-    
+
         $modelContent = file_get_contents($modelPath);
         $fillableColumns = array_map(fn($column) => "'{$column}'", $table_full_columns);
         $fillableString = implode(', ', $fillableColumns);
@@ -309,9 +308,7 @@ class ProductController extends Controller
         }
     }
 
-    public function upsert(Request $request) {
-
-    }
+    public function upsert(Request $request) {}
 
     public function updateCell(Request $request)
     {
@@ -320,43 +317,40 @@ class ProductController extends Controller
             $colIndex = $request->input('colIndex');
             $value = $request->input('value');
             $productId = $request->input('id');
-    
+
             if (!$productId) {
                 return response()->json(['success' => false, 'message' => 'Product ID is required'], 400);
             }
             $product_table = ProductsMst::find($productId);
-    
+
             if (!$product_table) {
                 return response()->json(['success' => false, 'message' => 'Product table not found'], 404);
             }
 
             $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']);
-            
+
             if (!class_exists($modelClass)) {
                 return response()->json(['success' => false, 'message' => 'Model class not found'], 404);
             }
-    
+
             $products = $modelClass::all();
-    
+
             if ($rowIndex >= count($products)) {
                 return response()->json(['success' => false, 'message' => 'Row index out of range'], 400);
             }
-    
+
             $product = $products[$rowIndex];
-    
+
             if (!array_key_exists($colIndex, $product->toArray())) {
                 return response()->json(['success' => false, 'message' => 'Column index not found'], 400);
             }
-    
+
             $product[$colIndex] = $value;
             $product->save();
-    
+
             return response()->json(['success' => true]);
-    
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
-
-
 }
