@@ -37,6 +37,31 @@
             </form>
         </div>
     </div>
+    {{-- フィールドモーダル --}}
+    <div id="settingsFieldModal" class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]" onclick="closeFieldModal(event)">
+        <div class="bg-white min-w-[500px] p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
+            <button onclick="closeFieldModal()" class="text-xl absolute top-3 right-6 text-gray-500 hover:text-gray-700">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h2 class="text-sm font-bold mt-3 !mb-3 border-b pb-3 text-gray-600">{{$current_list['product_name']}}のメモ用のフィールド追加</h2>
+            <form id="settingsFieldForm" action="{{ route('product.addField') }}" method="POST">
+                @csrf
+                <input type="text" value={{$id}} class="hidden" name="product_id">
+                <div>
+                    <button type="button" onclick="addField()"><i class="fa-solid mb-4 fa-circle-plus text-xl text-green-500"></i></button>
+                    <div id="field-container">
+                        <!-- フィールドが追加される場所 -->
+                    </div>
+                </div>
+                <div class="text-center text-sm mt-8">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">保存</button>
+                    <button type="button" onclick="closeFieldModal()" class="ml-2 bg-gray-300 py-2 px-4 rounded">キャンセル</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -67,6 +92,7 @@
                             リスト追加
                         </a> --}}
                         <button id="settings_button" onclick="openModal()"><i class="text-sm fa-solid fa-gear text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示設定</i></button>
+                        <button id="field_button" onclick="openFieldModal()"><i class="text-sm fa-solid fa-gear text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　メモフィールド設定</i></button>
                     </div>
 
                     <div class="overflow-scroll !h-[650px]">

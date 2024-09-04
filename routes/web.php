@@ -26,6 +26,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/update-cell', [ProductController::class, 'updateCell'])->name('updateCell');
     Route::post('/product/can-view', [ProductController::class, 'canView'])->name('product.canView');
+    Route::post('/product/add-field', [ProductController::class, 'addField'])->name('product.addField');
 });
 
 

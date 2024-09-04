@@ -363,4 +363,9 @@ class ProductController extends Controller
         $product->save();
         return redirect()->route('products.show', $product->id);
     }
+
+    public function addField(Request $request)
+    {
+        dd($request->input());
+    }
 }
