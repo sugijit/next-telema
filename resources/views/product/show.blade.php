@@ -1,5 +1,5 @@
 <x-app-layout>
-    {{-- モーダル --}}
+    {{-- 表示モーダル --}}
     <style>
         .modal-check-show:checked, .modal-check-show:focus {
             background-color: #059e52;
@@ -125,5 +125,63 @@
             </div>
         </div>
     </div>
-   <script src="{{asset('/js/modals.js')}}"></script>
+<script>
+    function makeEditable(rowIndex, colIndex) {
+        console.log(rowIndex);
+        console.log(colIndex);
+        
+        const textDiv = document.getElementById(`editable-text-${rowIndex}-${colIndex}`);
+        const inputField = document.getElementById(`editable-input-${rowIndex}-${colIndex}`);
+        textDiv.style.display = 'none';
+        inputField.style.display = 'block';
+        inputField.focus();
+    }
+
+    function saveChanges(rowIndex, colIndex) {
+        const id = "{{ $id }}";
+        const textDiv = document.getElementById(`editable-text-${rowIndex}-${colIndex}`);
+        const inputField = document.getElementById(`editable-input-${rowIndex}-${colIndex}`);
+        const newValue = inputField.value;
+
+        // データをサーバーに送信
+        fetch('/update-cell', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                rowIndex: rowIndex,
+                colIndex: colIndex,
+                value: newValue,
+                id: id,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (newValue == null || newValue == "" || newValue == " " || newValue == "　") {
+                    textDiv.textContent = "-";
+                } else {
+                    textDiv.textContent = newValue;
+                }
+            } else {
+                alert('変更の保存に失敗しました');
+            }
+            textDiv.style.display = 'block';
+            inputField.style.display = 'none';
+            if(newValue == null || newValue == "") {
+                textDiv.value = "-";
+            }
+
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('エラーが発生しました');
+            textDiv.style.display = 'block';
+            inputField.style.display = 'none';
+        });
+    }
+</script>
+<script src="{{asset('/js/modals.js')}}"></script>
 </x-app-layout>
