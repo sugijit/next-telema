@@ -74,6 +74,7 @@ class ProductController extends Controller
             return view('product.add', compact('products', 'current_list'));
         }
 
+
         $products = ProductsMst::all()->toArray();
 
         $can_views = json_decode($current_list["view"], TRUE);
@@ -82,6 +83,7 @@ class ProductController extends Controller
         $hard_header = json_decode($current_list["header"], TRUE);
 
         foreach ($can_views as $key => $can_view) {
+
             if ($can_view == 0) {
                 unset($header[$key]);
                 foreach ($list_items as $a => &$item) {
@@ -90,9 +92,6 @@ class ProductController extends Controller
                 unset($item);
             }
         }
-        // dd($header);
-
-        // dd($list_items);
 
         return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header'));
     }
@@ -123,26 +122,6 @@ class ProductController extends Controller
 
     public function upload(Request $request)
     {
-
-        //テレマリストの後ろの列　※ここ変えたら必ず show()の配列も変更するように！！！
-        $telema_columns_eng_jp = [
-            'telema_call_date' => '架電日',
-            'telema_result' => '結果',
-            'telema_call_user_name' => '架電担当者',
-            'telema_call_count' => '架電回数',
-            'telema_atokaku' => 'アトカク',
-            'telema_call_plan_date' => '再架電予定、状況',
-            'telema_service_now' => '現利用サービス',
-            'telema_acq_server' => '獲得サーバー',
-            'telema_server_size' => 'サイズ',
-            'telema_server_color' => '色',
-            'telema_mail' => 'メールアドレス',
-            'telema_arrival_date' => '配送日',
-            'telema_arrival_time' => '到着時間',
-            'telema_benefits' => '補償優待',
-        ];
-        $telema_columns = array_flip($telema_columns_eng_jp);
-
 
         $request->validate([
             'csv_file' => 'required|mimes:csv,txt',
@@ -180,8 +159,7 @@ class ProductController extends Controller
         $product_name = $request->input('product_name');
         $uploaded_header_eng = $rows[0];
         $column_names = array_shift($rows);
-        // $column_names['header'] = "header";
-        $table_full_columns = array_merge($column_names, $telema_columns);
+        $table_full_columns = $column_names;
 
         // 表示非表示用に生成 productsmstsに登録
         $product_mst_view = $table_full_columns;
@@ -201,14 +179,13 @@ class ProductController extends Controller
         $last_two_header_eng_jp_arr['updated_at'] = '更新日';
         $term_header = array_combine($uploaded_header_eng, $header);
         $full_header_eng_jp_arr = array_merge($full_header_eng_jp_arr, $term_header);
-        $full_header_eng_jp_arr = array_merge($full_header_eng_jp_arr, $telema_columns_eng_jp);
         $full_header_eng_jp_arr = array_merge($full_header_eng_jp_arr, $last_two_header_eng_jp_arr);
         $full_header_eng_jp_arr = json_encode($full_header_eng_jp_arr);
 
 
         // テーブル作成
         try {
-            $this->createTable($table_name, $column_names, $telema_columns);
+            $this->createTable($table_name, $column_names);
         } catch (Exception $e) {
             return back();
         }
@@ -243,7 +220,7 @@ class ProductController extends Controller
     }
 
 
-    protected function createTable($table_name, $column_names, $telema_columns)
+    protected function createTable($table_name, $column_names)
     {
         try {
             DB::beginTransaction();
@@ -251,13 +228,10 @@ class ProductController extends Controller
                 throw new Exception("テーブル {$table_name} は既に存在しています。");
                 return false;
             }
-            Schema::create($table_name, function (Blueprint $table) use ($column_names, $telema_columns) {
+            Schema::create($table_name, function (Blueprint $table) use ($column_names) {
                 $table->id();
                 foreach ($column_names as $column_name) {
                     $table->string($column_name)->nullable();
-                }
-                foreach ($telema_columns as $telema_column) {
-                    $table->string($telema_column)->nullable();
                 }
                 $table->timestamps();
             });
@@ -388,6 +362,12 @@ class ProductController extends Controller
         $product = ProductsMst::find($product_id);
         $table_name = "product_" . $product->table_name . 's';
 
+
+
+        $posted_data_in_array = array_chunk($posted_data, 4, true);
+        $this->headerAndViewUpdate($product_id, $posted_data_in_array);
+
+
         // migration (field 追加)
         $field_names = [];
         foreach ($posted_data as $key => $value) {
@@ -434,7 +414,8 @@ class ProductController extends Controller
         $product->save();
 
         // ヘッダー生成
-        $this->headerUpdate($product_id, $posted_data_in_array);
+        $posted_data_in_array = array_chunk($posted_data, 4, true);
+        $this->headerAndViewUpdate($product_id, $posted_data_in_array);
 
 
         // showへリダイレクト
@@ -443,12 +424,14 @@ class ProductController extends Controller
     }
 
 
-    // showで見せるためのproductsmstsのheader更新
-    public function headerUpdate($product_id, $new_field)
+    // showで見せるためのproductsmstsのheader, view更新
+    public function headerAndViewUpdate($product_id, $new_field)
     {
         $product = ProductsMst::find($product_id);
         $old_header = $product->header;
+        $old_view = $product->view;
         $old_header_array = json_decode($old_header, TRUE);
+        $old_view_array = json_decode($old_view, TRUE);
 
         // 追加されるヘッダーの配列生成
         $header_tobe_added = [];
@@ -458,7 +441,7 @@ class ProductController extends Controller
                 if (strpos($key, 'field_name_') === 0) {
                     $fieldKey = $value;
                 } elseif (strpos($key, 'field_value_') === 0 && $fieldKey !== null) {
-                    $header_tobe_added[$fieldKey] = $value;
+                    $header_tobe_added["telema_" . $fieldKey] = $value;
                 }
             }
         }
@@ -469,8 +452,19 @@ class ProductController extends Controller
         $arrayAfter = array_slice($old_header_array, $index, null, true);
         $new_header = array_merge($arrayBefore, $header_tobe_added, $arrayAfter);
 
+        //view　結合
+        foreach ($header_tobe_added as $key => $view) {
+            $view_tobe_added[$key] = 1;
+        }
+        $viewArrayBefore = array_slice($old_view_array, 0, $index, true);
+        $viewArrayAfter = array_slice($old_view_array, $index, null, true);
+        $new_view = array_merge($viewArrayBefore, $view_tobe_added, $viewArrayAfter);
+
+        //masterへ保存
         $new_header = json_encode($new_header);
+        $new_view = json_encode($new_view);
         $product->header = $new_header;
+        $product->view = $new_view;
         $product->save();
 
         return true;
