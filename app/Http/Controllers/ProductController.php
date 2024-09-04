@@ -388,7 +388,6 @@ class ProductController extends Controller
         $product = ProductsMst::find($product_id);
         $table_name = "product_" . $product->table_name . 's';
 
-
         // migration (field 追加)
         $field_names = [];
         foreach ($posted_data as $key => $value) {
@@ -434,8 +433,46 @@ class ProductController extends Controller
         $product->custom_fields = $posted_data_in_json;
         $product->save();
 
+        // ヘッダー生成
+        $this->headerUpdate($product_id, $posted_data_in_array);
+
+
         // showへリダイレクト
         return redirect()->route('products.show', $product->id)
             ->with('success', "フィールド追加しました。");
+    }
+
+
+    // showで見せるためのproductsmstsのheader更新
+    public function headerUpdate($product_id, $new_field)
+    {
+        $product = ProductsMst::find($product_id);
+        $old_header = $product->header;
+        $old_header_array = json_decode($old_header, TRUE);
+
+        // 追加されるヘッダーの配列生成
+        $header_tobe_added = [];
+        foreach ($new_field as $item) {
+            $fieldKey = null;
+            foreach ($item as $key => $value) {
+                if (strpos($key, 'field_name_') === 0) {
+                    $fieldKey = $value;
+                } elseif (strpos($key, 'field_value_') === 0 && $fieldKey !== null) {
+                    $header_tobe_added[$fieldKey] = $value;
+                }
+            }
+        }
+
+        // 新しいヘッダー生成（結合）
+        $index = count($old_header_array) - 2;
+        $arrayBefore = array_slice($old_header_array, 0, $index, true);
+        $arrayAfter = array_slice($old_header_array, $index, null, true);
+        $new_header = array_merge($arrayBefore, $header_tobe_added, $arrayAfter);
+
+        $new_header = json_encode($new_header);
+        $product->header = $new_header;
+        $product->save();
+
+        return true;
     }
 }
