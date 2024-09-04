@@ -284,9 +284,26 @@ class ProductController extends Controller
         $fillableColumns = array_map(fn($column) => "'{$column}'", $table_full_columns);
         $fillableString = implode(', ', $fillableColumns);
         $fillableProperty = "protected \$fillable = [\n    {$fillableString}\n];";
+
+        // Insert the $fillable property
         $useFactoryPosition = strpos($modelContent, 'use HasFactory;') + strlen('use HasFactory;') + 1;
         $extendsPosition = strpos($modelContent, 'extends Model') - 1;
         $modelContent = substr_replace($modelContent, "\n    {$fillableProperty}\n", $useFactoryPosition, $extendsPosition - $useFactoryPosition);
+
+        // Insert the updateFillable method after the $fillable property
+        $updateFillableMethod = <<<EOD
+    
+        public function updateFillable(array  \$columnNames)
+        {
+            \$this->fillable = array_merge(\$this->fillable,  \$columnNames);
+        }
+        EOD;
+
+        // Find the position to insert the method after the $fillable property
+        $fillableEndPosition = strpos($modelContent, '];', $useFactoryPosition) + 2;
+        $modelContent = substr_replace($modelContent, "{$updateFillableMethod}\n", $fillableEndPosition, 0);
+
+        // Ensure the model file is saved correctly
         file_put_contents($modelPath, $modelContent);
 
         return;
@@ -366,6 +383,59 @@ class ProductController extends Controller
 
     public function addField(Request $request)
     {
-        dd($request->input());
+        $product_id = $request->input('product_id');
+        $posted_data = array_slice($request->input(), 2);
+        $product = ProductsMst::find($product_id);
+        $table_name = "product_" . $product->table_name . 's';
+
+
+        // migration (field 追加)
+        $field_names = [];
+        foreach ($posted_data as $key => $value) {
+            if (strpos($key, 'field_name_') === 0) {
+                $field_names[] = "telema_" . $value;
+            }
+        }
+
+        try {
+            DB::beginTransaction();
+            if (Schema::hasTable($table_name)) {
+                Schema::table($table_name, function (Blueprint $table) use ($field_names) {
+                    foreach ($field_names as $field_name) {
+                        $table->text($field_name)->nullable();
+                    }
+                });
+                $field_names_copy = $field_names;
+                $last_field = array_pop($field_names_copy);
+
+                DB::statement("ALTER TABLE {$table_name} MODIFY COLUMN created_at TIMESTAMP NULL AFTER {$last_field}");
+                DB::statement("ALTER TABLE {$table_name} MODIFY COLUMN updated_at TIMESTAMP NULL AFTER created_at");
+            } else {
+                throw new Exception("テーブル {$table_name} は存在しません。");
+                return false;
+            }
+        } catch (QueryException $e) {
+            DB::rollBack();
+            return back()->with('error', 'クエリエラーが発生しました: ' . $e->getMessage());
+        }
+
+        // モデルに追記 $fillable
+        $full_field_names = Schema::getColumnListing($table_name);
+        $elementsToRemove = ['id', 'created_at', 'updated_at'];
+        $full_field_names = array_diff($full_field_names, $elementsToRemove);
+        $model_name = "Product" . ucfirst($product->table_name);
+        $modelClass = 'App\\Models\\' . $model_name;
+        $model = app($modelClass);
+        $model->updateFillable($full_field_names);
+
+        // ProductsMstsにフォーム情報を追加
+        $posted_data_in_array = array_chunk($posted_data, 4, true);
+        $posted_data_in_json = json_encode($posted_data_in_array);
+        $product->custom_fields = $posted_data_in_json;
+        $product->save();
+
+        // showへリダイレクト
+        return redirect()->route('products.show', $product->id)
+            ->with('success', "フィールド追加しました。");
     }
 }
