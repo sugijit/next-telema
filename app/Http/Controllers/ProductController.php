@@ -474,4 +474,74 @@ class ProductController extends Controller
 
         return true;
     }
+
+    public function deleteField(Request $request, $productId)
+    {
+        $request->validate([
+            'field_name' => 'required|string',
+        ]);
+
+        $product = ProductsMst::find($productId);
+        if (!$product) {
+            return back()->with('error', 'Product not found.');
+        }
+
+        $customFields = json_decode($product->custom_fields, true);
+        $view = json_decode($product->view, true);
+        $header = json_decode($product->header, true);
+
+        $fieldName = $request->input('field_name');
+
+        // custom fieldから削除
+        $filtered_array = array_filter($customFields, function ($item) use ($fieldName) {
+            foreach ($item as $key => $value) {
+                if (strpos($key, 'field_name') !== false && $value === $fieldName) {
+                    return false;
+                }
+            }
+            return true;
+        });
+        $filtered_array = array_values($filtered_array);
+
+        foreach ($filtered_array as $index => &$item) {
+            $item = [
+                "field_name_" . ($index + 1) => $item["field_name_" . ($index + 2)],
+                "field_value_" . ($index + 1) => $item["field_value_" . ($index + 2)],
+                "field_type_" . ($index + 1) => $item["field_type_" . ($index + 2)],
+                "options_" . ($index + 1) => $item["options_" . ($index + 2)],
+            ];
+        }
+
+
+        // view 削除
+        $view_name = "telema_" . $fieldName;
+        if (array_key_exists($view_name, $view)) {
+            unset($view[$view_name]);
+        }
+
+        // header 削除
+        if (array_key_exists($view_name, $header)) {
+            unset($header[$view_name]);
+        }
+
+        // マイグレーション削除
+        $field_name_db = "telema_" . $fieldName; // DBのカラム名を設定
+        $table_name = "product_" . $product->table_name . 's'; // テーブル名を設定
+
+        // DBからカラムを削除
+        try {
+            Schema::table($table_name, function (Blueprint $table) use ($field_name_db) {
+                $table->dropColumn($field_name_db);
+            });
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error deleting column: ' . $e->getMessage()], 500);
+        }
+
+        $product->custom_fields = json_encode($filtered_array);
+        $product->view = json_encode($view);
+        $product->header = json_encode($header);
+        $product->save();
+
+        return response()->json(['success' => 'Field deleted successfully.', 'pyzda' => $filtered_array]);
+    }
 }

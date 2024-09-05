@@ -27,27 +27,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/update-cell', [ProductController::class, 'updateCell'])->name('updateCell');
     Route::post('/product/can-view', [ProductController::class, 'canView'])->name('product.canView');
     Route::post('/product/add-field', [ProductController::class, 'addField'])->name('product.addField');
+    Route::post('/products/{productId}/delete-field', [ProductController::class, 'deleteField'])->name('products.deleteField');
 });
-
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::resource('users', UserController::class);
 });
 
-
-
-
-
 require __DIR__ . '/auth.php';
-
-
-
-
-
-
-
-
-
 
 // admin使う場合：
 // Route::get('/admin-only', function () {

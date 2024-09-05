@@ -64,11 +64,3 @@ function toggleOptions(fieldId, selectElement) {
         optionsContainer.classList.add('hidden');
     }
 }
-
-function removeField(fieldId) {
-    const fieldElement = document.getElementById(`field-${fieldId}`);
-    if (fieldElement) {
-        fieldElement.remove();
-        // Optionally, you can update fieldCount here if needed
-    }
-}
