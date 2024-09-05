@@ -57,14 +57,14 @@
                                     <div class="flex align-center gap-3 mb-2" id="field-{{ $currentFieldIndex }}">
                                         <button type="button" onclick="removeField({{ $currentFieldIndex }})" class="text-red-500 hover:text-red-700">削除</button>
                                         <p class="pt-1">{{ $currentFieldIndex }}</p>
-                                        <input class="text-xs rounded-md placeholder:text-[0.6rem]" type="text" name="field_name_{{ $currentFieldIndex }}" placeholder="(英字) 例：result" value="{{ $field['field_name_'.$currentFieldIndex] }}">
-                                        <input class="text-xs rounded-md" type="text" name="field_value_{{ $currentFieldIndex }}" placeholder="例：結果" value="{{ $field['field_value_'.$currentFieldIndex] }}">
-                                        <select class="text-xs rounded-md" name="field_type_{{ $currentFieldIndex }}" onchange="toggleOptions({{ $currentFieldIndex }}, this)">
-                                            <option value="text" {{ $value === 'text' ? 'selected' : '' }}>テキスト式</option>
-                                            <option value="select" {{ $value === 'select' ? 'selected' : '' }}>選択式</option>
+                                        <input class="text-xs rounded-md placeholder:text-[0.6rem]" type="text" name="field_name_{{ $currentFieldIndex }}" placeholder="(英字) 例：result" value="{{ $field['field_name_'.$currentFieldIndex] }}" >
+                                        <input class="text-xs rounded-md" type="text" name="field_value_{{ $currentFieldIndex }}" placeholder="例：結果" value="{{ $field['field_value_'.$currentFieldIndex] }}" >
+                                        <select class="text-xs rounded-md" name="field_type_{{ $currentFieldIndex }}" onchange="toggleOptions({{ $currentFieldIndex }}, this)" >
+                                            <option value="text" {{ $value === 'text' ? 'selected' : '' }}>テキスト式</option >
+                                            <option value="select" {{ $value === 'select' ? 'selected' : '' }}>選択式</option >
                                         </select>
                                         <div id="options-container-{{ $currentFieldIndex }}" class="{{ $value === 'select' ? '' : 'hidden' }}">
-                                            <input class="text-xs rounded-md" type="text" name="options_{{ $currentFieldIndex }}" placeholder="選択肢 (カンマで区切る)" value="{{ $field['options_'.$currentFieldIndex] }}">
+                                            <input class="text-xs rounded-md" type="text" name="options_{{ $currentFieldIndex }}" placeholder="選択肢 (カンマで区切る)" value="{{ $field['options_'.$currentFieldIndex] }}" >
                                         </div>
                                     </div>
                                     @php $currentFieldIndex++; @endphp
@@ -232,14 +232,13 @@
 
     //remove field
     function removeField(fieldId) {
+        console.log(fieldId)
         const productId = "{{ $id }}";
-        console.log(productId);
+        console.log(productId)
         const fieldElement = document.getElementById(`field-${fieldId}`);
-        console.log(fieldElement);
         if (fieldElement) {
             const fieldName = fieldElement.querySelector('input[name^="field_name_"]').value; // Get the field name
-            console.log(fieldName);
-            // Send a request to delete the field
+            console.log(fieldName)
             fetch(`/products/${productId}/delete-field`, {
                 method: 'POST',
                 headers: {
@@ -250,7 +249,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data);
+                console.log(data)
                 if (data.success) {
                     fieldElement.remove(); // Remove the field from the DOM
                 } else {

@@ -364,22 +364,62 @@ class ProductController extends Controller
     {
         $product_id = $request->input('product_id');
         $posted_data = array_slice($request->input(), 2);
+        // dd($posted_data);
         $product = ProductsMst::find($product_id);
         $table_name = "product_" . $product->table_name . 's';
 
 
-
         $posted_data_in_array = array_chunk($posted_data, 4, true);
-        $this->headerAndViewUpdate($product_id, $posted_data_in_array);
 
 
-        // migration (field 追加)
-        $field_names = [];
-        foreach ($posted_data as $key => $value) {
-            if (strpos($key, 'field_name_') === 0) {
-                $field_names[] = "telema_" . $value;
+
+        // dd($posted_data_in_array);
+        $old_mst_fields = json_decode($product->custom_fields, TRUE);
+        if ($old_mst_fields != null) {
+            $posted_data_in_array = array_filter($posted_data_in_array, function ($item) use ($old_mst_fields) {
+                foreach ($old_mst_fields as $compareItem) {
+                    // 配列2の各要素と一致する場合にフィルタリング
+                    if ($item == $compareItem) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+            // dd($posted_data_in_array);
+            $field_names = [];
+            $copy = [];
+
+            foreach ($posted_data_in_array as $item) {
+                foreach ($item as $key => $value) {
+                    $copy[$key] = $value;
+                }
+            }
+            $posted_data_in_array = $copy;
+
+
+
+            foreach ($posted_data_in_array as $key => $value) {
+                if (strpos($key, 'field_name_') === 0) {
+                    $field_names[] = "telema_" . $value;
+                }
+            }
+        } else {
+            $field_names = [];
+            foreach ($posted_data as $key => $value) {
+                if (strpos($key, 'field_name_') === 0) {
+                    $field_names[] = "telema_" . $value;
+                }
             }
         }
+
+
+
+        // dd($field_names);
+
+
+
+        // $this->headerAndViewUpdate($product_id, $posted_data_in_array);
+
 
         try {
             DB::beginTransaction();
@@ -391,7 +431,7 @@ class ProductController extends Controller
                 });
                 $field_names_copy = $field_names;
                 $last_field = array_pop($field_names_copy);
-
+                // dd($last_field);
                 DB::statement("ALTER TABLE {$table_name} MODIFY COLUMN created_at TIMESTAMP NULL AFTER {$last_field}");
                 DB::statement("ALTER TABLE {$table_name} MODIFY COLUMN updated_at TIMESTAMP NULL AFTER created_at");
             } else {
@@ -477,9 +517,7 @@ class ProductController extends Controller
 
     public function deleteField(Request $request, $productId)
     {
-        $request->validate([
-            'field_name' => 'required|string',
-        ]);
+
 
         $product = ProductsMst::find($productId);
         if (!$product) {
@@ -492,7 +530,6 @@ class ProductController extends Controller
 
         $fieldName = $request->input('field_name');
 
-        // custom fieldから削除
         $filtered_array = array_filter($customFields, function ($item) use ($fieldName) {
             foreach ($item as $key => $value) {
                 if (strpos($key, 'field_name') !== false && $value === $fieldName) {
@@ -504,31 +541,33 @@ class ProductController extends Controller
         $filtered_array = array_values($filtered_array);
 
         foreach ($filtered_array as $index => &$item) {
-            $item = [
-                "field_name_" . ($index + 1) => $item["field_name_" . ($index + 2)],
-                "field_value_" . ($index + 1) => $item["field_value_" . ($index + 2)],
-                "field_type_" . ($index + 1) => $item["field_type_" . ($index + 2)],
-                "options_" . ($index + 1) => $item["options_" . ($index + 2)],
-            ];
+            if (isset($item["field_name_" . ($index + 2)])) {
+                $item = [
+                    "field_name_" . ($index + 1) => $item["field_name_" . ($index + 2)],
+                    "field_value_" . ($index + 1) => $item["field_value_" . ($index + 2)],
+                    "field_type_" . ($index + 1) => $item["field_type_" . ($index + 2)],
+                    "options_" . ($index + 1) => $item["options_" . ($index + 2)],
+                ];
+            }
         }
 
 
-        // view 削除
+
         $view_name = "telema_" . $fieldName;
         if (array_key_exists($view_name, $view)) {
             unset($view[$view_name]);
         }
 
-        // header 削除
+
         if (array_key_exists($view_name, $header)) {
             unset($header[$view_name]);
         }
 
-        // マイグレーション削除
-        $field_name_db = "telema_" . $fieldName; // DBのカラム名を設定
-        $table_name = "product_" . $product->table_name . 's'; // テーブル名を設定
 
-        // DBからカラムを削除
+        $field_name_db = "telema_" . $fieldName;
+        $table_name = "product_" . $product->table_name . 's';
+
+
         try {
             Schema::table($table_name, function (Blueprint $table) use ($field_name_db) {
                 $table->dropColumn($field_name_db);
@@ -537,11 +576,15 @@ class ProductController extends Controller
             return response()->json(['success' => false, 'message' => 'Error deleting column: ' . $e->getMessage()], 500);
         }
 
-        $product->custom_fields = json_encode($filtered_array);
+        if (empty($filtered_array)) {
+            $product->custom_fields = null;
+        } else {
+            $product->custom_fields = json_encode($filtered_array);
+        }
         $product->view = json_encode($view);
         $product->header = json_encode($header);
         $product->save();
 
-        return response()->json(['success' => 'Field deleted successfully.', 'pyzda' => $filtered_array]);
+        return response()->json(['success' => 'Field deleted successfully.', 'pyzda' => $table_name]);
     }
 }
