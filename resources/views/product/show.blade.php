@@ -51,6 +51,47 @@
                     <button type="button" onclick="addField()"><i class="fa-solid mb-4 fa-circle-plus text-xl text-green-500"></i></button>
                     <div id="field-container">
                         <!-- フィールドが追加される場所 -->
+
+
+
+
+                        @foreach ($fields as $field) 
+                            @foreach ($field as $key => $value) 
+                                @if (strpos($key, 'field_type') !== false) 
+                                    @if ($value === 'text') 
+                                        <div class="flex align-center gap-3 mb-2">
+                                            <p class="pt-1">{{ $loop->parent->iteration }}</p> <!-- カウンターを使用 -->
+                                            <input class="text-xs rounded-md placeholder:text-[0.6rem]" type="text" name="field_name_{{ $loop->parent->iteration }}" placeholder="(英字) 例：result" value="{{ $field['field_name_'.$loop->parent->iteration] }}">
+                                            <input class="text-xs rounded-md" type="text" name="field_value_{{ $loop->parent->iteration }}" placeholder="例：結果" value="{{ $field['field_value_'.$loop->parent->iteration] }}">
+                                            <select class="text-xs rounded-md" name="field_type_{{ $loop->parent->iteration }}" onchange="toggleOptions({{ $loop->parent->iteration }}, this)">
+                                                <option value="text" selected>テキスト式</option>
+                                                <option value="select">選択式</option>
+                                            </select>
+                                            <div id="options-container-{{ $loop->parent->iteration }}" class="hidden">
+                                                <input class="text-xs rounded-md" type="text" name="options_{{ $loop->parent->iteration }}" placeholder="選択肢 (カンマで区切る)" value="{{ $field['options_'.$loop->parent->iteration] }}">
+                                            </div>
+                                        </div>
+                                    @elseif($value === 'select') 
+                                        <div class="flex align-center gap-3 mb-2">
+                                            <p class="pt-1">{{ $loop->parent->iteration }}</p> <!-- カウンターを使用 -->
+                                            <input class="text-xs rounded-md placeholder:text-[0.6rem]" type="text" name="field_name_{{ $loop->parent->iteration }}" placeholder="(英字) 例：result" value="{{ $field['field_name_'.$loop->parent->iteration] }}">
+                                            <input class="text-xs rounded-md" type="text" name="field_value_{{ $loop->parent->iteration }}" placeholder="例：結果" value="{{ $field['field_value_'.$loop->parent->iteration] }}">
+                                            <select class="text-xs rounded-md" name="field_type_{{ $loop->parent->iteration }}" onchange="toggleOptions({{ $loop->parent->iteration }}, this)">
+                                                <option value="text">テキスト式</option>
+                                                <option value="select" selected>選択式</option>
+                                            </select>
+                                            <div id="options-container-{{ $loop->parent->iteration }}">
+                                                <input class="text-xs rounded-md" type="text" name="options_{{ $loop->parent->iteration }}" placeholder="選択肢 (カンマで区切る)" value="{{ $field['options_'.$loop->parent->iteration] }}">
+                                            </div>
+                                        </div>
+                                    @endif
+                                @endif
+                            @endforeach
+                        @endforeach
+
+
+
+
                     </div>
                 </div>
                 <div class="text-center text-sm mt-8">

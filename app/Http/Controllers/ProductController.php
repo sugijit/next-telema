@@ -93,7 +93,12 @@ class ProductController extends Controller
             }
         }
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header'));
+        $fields = json_decode($product_table->custom_fields, TRUE);
+        $fields = $fields ? $fields : [];
+        // dd($fields);
+
+
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields'));
     }
 
     /**
