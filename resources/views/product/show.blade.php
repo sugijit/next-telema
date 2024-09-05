@@ -13,7 +13,7 @@
 
     {{-- フィールドモーダル --}}
     <div id="settingsFieldModalAdd" class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]" onclick="closeFieldModalAdd(event)">
-        <div class="bg-white min-w-[500px] max-h-[80%] overflow-scroll p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
+        <div class="bg-white min-w-[500px] max-h-[80%] overflow-y-scroll p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
             <button onclick="closeFieldModalAdd()" class="text-xl absolute top-3 right-6 text-gray-500 hover:text-gray-700">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -55,7 +55,7 @@
     </div>
     {{-- フィールドモーダル  DELETE --}}
     <div id="settingsFieldModalDelete" class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]" onclick="closeFieldModalDelete(event)">
-        <div class="bg-white min-w-[500px] p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
+        <div class="bg-white min-w-[500px] max-h-[80%] overflow-y-scroll p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
             <button onclick="closeFieldModalDelete()" class="text-xl absolute top-3 right-6 text-gray-500 hover:text-gray-700">
                 <i class="fa-solid fa-xmark"></i>
             </button>
