@@ -11,6 +11,35 @@
         }
     </style>
 
+    {{-- hide and seek --}}
+    <div id="settingsModal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]" onclick="closeModal(event)"> <!-- hidden nemeh-->
+        <div class="bg-white p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
+            <button onclick="closeModal()" class="text-xl absolute top-3 right-6 text-gray-500 hover:text-gray-700">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h2 class="text-sm font-bold mt-3 !mb-6 border-b pb-3 text-gray-600">{{$current_list['product_name']}}</h2>
+            <form id="settingsForm" action="{{ route('product.canView') }}" method="POST">
+                @csrf
+                <div class="grid grid-cols-3 gap-x-16">
+                    <input type="text" value={{$id}} class="hidden" name="product_id">
+                    @foreach($hard_header as $key => $head)
+                        <div class="mb-1 flex text-xs">
+                            <label class="block text-sm font-medium min-w-[120px]">{{ $head }}</label>
+                            <div class="flex modal">
+                                <input type="radio" name="{{ $key }}" value="1" class="modal-check-show mr-2 transform scale-[80%]" {{ isset($view_settings[$key]) && $view_settings[$key] == 1 ? 'checked' : ''}}>
+                                <input type="radio" name="{{ $key }}" value="0" class="modal-check-hide mr-2 transform scale-[80%]" {{ isset($view_settings[$key]) && $view_settings[$key] == 0 ? 'checked' : ''}}>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="text-center text-sm mt-8">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">保存</button>
+                    <button type="button" onclick="closeModal()" class="ml-2 bg-gray-300 py-2 px-4 rounded">キャンセル</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     {{-- フィールドモーダル --}}
     <div id="settingsFieldModalAdd" class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]" onclick="closeFieldModalAdd(event)">
         <div class="bg-white min-w-[500px] max-h-[80%] overflow-y-scroll p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
