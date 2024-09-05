@@ -540,16 +540,19 @@ class ProductController extends Controller
         });
         $filtered_array = array_values($filtered_array);
 
-        foreach ($filtered_array as $index => &$item) {
-            if (isset($item["field_name_" . ($index + 2)])) {
-                $item = [
-                    "field_name_" . ($index + 1) => $item["field_name_" . ($index + 2)],
-                    "field_value_" . ($index + 1) => $item["field_value_" . ($index + 2)],
-                    "field_type_" . ($index + 1) => $item["field_type_" . ($index + 2)],
-                    "options_" . ($index + 1) => $item["options_" . ($index + 2)],
+        $new_array = [];
+        foreach ($filtered_array as $index => $item) {
+            $new_index = $index + 1; // 新しいインデックスを計算
+            if (isset($item["field_name_" . ($index + 1)])) {
+                $new_array[$new_index] = [
+                    "field_name_" . $new_index => $item["field_name_" . ($index + 1)],
+                    "field_value_" . $new_index => $item["field_value_" . ($index + 1)],
+                    "field_type_" . $new_index => $item["field_type_" . ($index + 1)],
+                    "options_" . $new_index => $item["options_" . ($index + 1)],
                 ];
             }
         }
+        $filtered_array = $new_array; // 新しい配列を元の配列に代入
 
 
 

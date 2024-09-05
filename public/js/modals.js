@@ -5,9 +5,13 @@
 function openModal() {
     document.getElementById('settingsModal').classList.remove('hidden');
 }
-function openFieldModal() {
-    fieldCount = document.querySelectorAll('#field-container > div').length; // Count existing fields
-    document.getElementById('settingsFieldModal').classList.remove('hidden');
+function openFieldModalAdd() {
+    fieldCount = document.querySelectorAll('#field-container1 > div').length; // Count existing fields
+    document.getElementById('settingsFieldModalAdd').classList.remove('hidden');
+}
+function openFieldModalDelete() {
+    fieldCount = document.querySelectorAll('#field-container2 > div').length; // Count existing fields
+    document.getElementById('settingsFieldModalDelete').classList.remove('hidden');
 }
 
 function closeModal(event) {
@@ -16,17 +20,18 @@ function closeModal(event) {
     }
     document.getElementById('settingsModal').classList.add('hidden');
 }
-function closeModal(event) {
+
+function closeFieldModalAdd(event) {
     if (event) {
         event.stopPropagation();
     }
-    document.getElementById('settingsModal').classList.add('hidden');
+    document.getElementById('settingsFieldModalAdd').classList.add('hidden');
 }
-function closeFieldModal(event) {
+function closeFieldModalDelete(event) {
     if (event) {
         event.stopPropagation();
     }
-    document.getElementById('settingsFieldModal').classList.add('hidden');
+    document.getElementById('settingsFieldModalDelete').classList.add('hidden');
 }
 
 
@@ -35,11 +40,10 @@ let fieldCount = 0;
 
 function addField() {
     fieldCount++;
-    const container = document.getElementById('field-container');
+    const container = document.getElementById('field-container1');
 
     const fieldHTML = `
         <div class="flex align-center gap-3 mb-2" id="field-${fieldCount}">
-            <button type="button" onclick="removeField(${fieldCount})" class="text-red-500 hover:text-red-700">削除</button>
             <p class="pt-1">${fieldCount}</p>
             <input class="text-xs rounded-md placeholder:text-[0.6rem]" type="text" name="field_name_${fieldCount}" placeholder="(英字) 例：result">
             <input class="text-xs rounded-md" type="text" name="field_value_${fieldCount}" placeholder="例：結果">
@@ -47,7 +51,7 @@ function addField() {
                 <option value="text">テキスト式</option>
                 <option value="select">選択式</option>
             </select>
-            <div id="options-container-${fieldCount}" class="hidden">
+            <div id="options-container1-${fieldCount}" class="hidden">
                 <input class="text-xs rounded-md" type="text" name="options_${fieldCount}" placeholder="選択肢 (カンマで区切る)">
             </div>
         </div>
@@ -57,7 +61,7 @@ function addField() {
 }
 
 function toggleOptions(fieldId, selectElement) {
-    const optionsContainer = document.getElementById(`options-container-${fieldId}`);
+    const optionsContainer = document.getElementById(`options-container1-${fieldId}`);
     if (selectElement.value === "select") {
         optionsContainer.classList.remove('hidden');
     } else {
