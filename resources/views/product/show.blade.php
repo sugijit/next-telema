@@ -82,6 +82,45 @@
             </form>
         </div>
     </div>
+    {{-- フィールドモーダル 変更 --}}
+    <div id="settingsFieldModalUpdate" class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]" onclick="closeFieldModalUpdate(event)">
+        <div class="bg-white min-w-[500px] max-h-[80%] overflow-y-scroll p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
+            <button onclick="closeFieldModalUpdate()" class="text-xl absolute top-3 right-6 text-gray-500 hover:text-gray-700">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h2 class="text-sm font-bold mt-3 !mb-3 border-b pb-3 text-gray-600">フィールド変更</h2>
+            <form id="settingsFieldForm" action="{{ route('product.updateField') }}" method="POST">
+                @csrf
+                <input type="text" value={{$id}} class="hidden" name="product_id">
+                <div id="field-container">
+                    @php $currentFieldIndex = 1; @endphp
+                    @foreach ($fields as $field) 
+                        @foreach ($field as $key => $value) 
+                            @if (strpos($key, 'field_type') !== false) 
+                                <div class="flex align-center gap-3 mb-2" id="field-{{ $currentFieldIndex }}">
+                                    <p class="pt-1">{{ $currentFieldIndex }}</p>
+                                    <input class="text-xs rounded-md opacity-20" type="text" name="field_name_{{ $currentFieldIndex }}" placeholder="(英字) 例：result" value="{{ $field['field_name_'.$currentFieldIndex] }}" readonly>
+                                    <input class="text-xs rounded-md" type="text" name="field_value_{{ $currentFieldIndex }}" placeholder="例：結果" value="{{ $field['field_value_'.$currentFieldIndex] }}">
+                                    <select class="text-xs rounded-md" name="field_type_{{ $currentFieldIndex }}" onchange="toggleOptionsUpdate({{ $currentFieldIndex }}, this)">
+                                        <option value="text" {{ $value === 'text' ? 'selected' : '' }}>テキスト式</option>
+                                        <option value="select" {{ $value === 'select' ? 'selected' : '' }}>選択式</option>
+                                    </select>
+                                    <div id="options-container-{{ $currentFieldIndex }}" class="{{ $value === 'select' ? '' : 'hidden' }}">
+                                        <input class="text-xs rounded-md" type="text" name="options_{{ $currentFieldIndex }}" placeholder="選択肢 (カンマで区切る)" value="{{ $field['options_'.$currentFieldIndex] }}">
+                                    </div>
+                                </div>
+                                @php $currentFieldIndex++; @endphp
+                            @endif
+                        @endforeach
+                    @endforeach
+                </div>
+                <div class="text-center text-sm mt-8">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">保存</button>
+                    <button type="button" onclick="closeFieldModalUpdate()" class="ml-2 bg-gray-300 py-2 px-4 rounded">キャンセル</button>
+                </div>
+            </form>
+        </div>
+    </div>
     {{-- フィールドモーダル  DELETE --}}
     <div id="settingsFieldModalDelete" class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]" onclick="closeFieldModalDelete(event)">
         <div class="bg-white min-w-[500px] max-h-[80%] overflow-y-scroll p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
@@ -149,7 +188,7 @@
                                     <a id="field_add" href="#" onclick="openFieldModalAdd()" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">追加</a>
                                 </li>
                                 <li>
-                                    <a id="field_update" href="#" onclick="openFieldModal()" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">変更</a>
+                                    <a id="field_update" href="#" onclick="openFieldModalUpdate()" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">変更</a>
                                 </li>
                                 <li>
                                     <a id="field_delete" href="#" onclick="openFieldModalDelete()" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">削除</a>
@@ -284,6 +323,8 @@
         }
         window.location.reload();
     }
+
+
 </script>
 <script src="{{asset('/js/modals.js')}}"></script>
 </x-app-layout>

@@ -13,6 +13,9 @@ function openFieldModalDelete() {
     fieldCount = document.querySelectorAll('#field-container2 > div').length; // Count existing fields
     document.getElementById('settingsFieldModalDelete').classList.remove('hidden');
 }
+function openFieldModalUpdate() {
+    document.getElementById('settingsFieldModalUpdate').classList.remove('hidden');
+}
 
 function closeModal(event) {
     if (event) {
@@ -32,6 +35,12 @@ function closeFieldModalDelete(event) {
         event.stopPropagation();
     }
     document.getElementById('settingsFieldModalDelete').classList.add('hidden');
+}
+function closeFieldModalUpdate(event) {
+    if (event) {
+        event.stopPropagation();
+    }
+    document.getElementById('settingsFieldModalUpdate').classList.add('hidden');
 }
 
 
@@ -62,6 +71,14 @@ function addField() {
 
 function toggleOptions(fieldId, selectElement) {
     const optionsContainer = document.getElementById(`options-container1-${fieldId}`);
+    if (selectElement.value === "select") {
+        optionsContainer.classList.remove('hidden');
+    } else {
+        optionsContainer.classList.add('hidden');
+    }
+}
+function toggleOptionsUpdate(fieldId, selectElement) {
+    const optionsContainer = document.getElementById(`options-container-${fieldId}`);
     if (selectElement.value === "select") {
         optionsContainer.classList.remove('hidden');
     } else {

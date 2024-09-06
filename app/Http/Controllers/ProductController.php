@@ -588,4 +588,54 @@ class ProductController extends Controller
 
         return response()->json(['success' => 'Field deleted successfully.', 'pyzda' => $table_name]);
     }
+
+
+
+
+    public function updateField(Request $request)
+    {
+        $posted_data = $request->input();
+
+        $product = ProductsMst::find($request->input('product_id'));
+        $custom_fields = $product->custom_fields;
+        $custom_fields_array = json_decode($custom_fields, TRUE);
+        $header = json_decode($product->header, true);
+
+        foreach ($custom_fields_array as $index => &$item) {
+            $fieldNumber = $index + 1;
+
+            if (isset($posted_data["field_name_{$fieldNumber}"])) {
+                $item["field_name_{$fieldNumber}"] = $posted_data["field_name_{$fieldNumber}"];
+            }
+
+            if (isset($posted_data["field_value_{$fieldNumber}"])) {
+                $item["field_value_{$fieldNumber}"] = $posted_data["field_value_{$fieldNumber}"];
+
+                $headerKey = "telema_" . $posted_data["field_name_{$fieldNumber}"];
+                if (array_key_exists($headerKey, $header)) {
+                    $header[$headerKey] = $posted_data["field_value_{$fieldNumber}"];
+                }
+            }
+
+            if (isset($posted_data["field_type_{$fieldNumber}"])) {
+                $item["field_type_{$fieldNumber}"] = $posted_data["field_type_{$fieldNumber}"];
+            }
+
+            if (isset($posted_data["options_{$fieldNumber}"])) {
+                if ($posted_data["field_type_{$fieldNumber}"] === "text") {
+                    $item["options_{$fieldNumber}"] = null;
+                } else {
+                    $item["options_{$fieldNumber}"] = $posted_data["options_{$fieldNumber}"];
+                }
+            }
+        }
+
+        $custom_fields = json_encode($custom_fields_array);
+
+        $product->custom_fields = $custom_fields;
+        $product->header = $header;
+        $product->save();
+
+        return redirect()->route('products.show', $product->id)->with('success', 'フィールドが更新されました。');
+    }
 }

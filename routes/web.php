@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/product/can-view', [ProductController::class, 'canView'])->name('product.canView');
     Route::post('/product/add-field', [ProductController::class, 'addField'])->name('product.addField');
     Route::post('/products/{productId}/delete-field', [ProductController::class, 'deleteField'])->name('products.deleteField');
+    Route::post('/product/update-field', [ProductController::class, 'updateField'])->name('product.updateField');
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
