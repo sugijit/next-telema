@@ -114,10 +114,14 @@
                         @endforeach
                     @endforeach
                 </div>
-                <div class="text-center text-sm mt-8">
-                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">保存</button>
-                    <button type="button" onclick="closeFieldModalUpdate()" class="ml-2 bg-gray-300 py-2 px-4 rounded">キャンセル</button>
-                </div>
+                @if(!empty($fields))
+                    <div class="text-center text-sm mt-8">
+                        <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">保存</button>
+                        <button type="button" onclick="closeFieldModalUpdate()" class="ml-2 bg-gray-300 py-2 px-4 rounded">キャンセル</button>
+                    </div>
+                @else
+                    <p class="text-center text-gray-400">フィールドありません</p>
+                @endif
             </form>
         </div>
     </div>
@@ -154,6 +158,9 @@
                                 @endif
                             @endforeach
                         @endforeach
+                        @if(empty($fields))
+                            <p class="text-center text-gray-400">フィールドありません</p>
+                        @endif
                     </div>
                 </div>
             </form>
