@@ -63,7 +63,7 @@ class ProductController extends Controller
 
         if ($product_table) {
             if ($product_table['table_name']) {
-                $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']);
+                $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
                 $list_items = $modelClass::all()->toArray();
                 $current_list = $product_table->toArray();
             }
@@ -159,8 +159,8 @@ class ProductController extends Controller
         $table = str_replace(' ', '', $request->input('table_name'));
         $table = strtolower($table);
 
-        $table_name = "product_" . $table . 's';
-        $model_name = "product_" . ucfirst($table);
+        $table_name = "product_" . $table . '1s';
+        $model_name = "product_" . ucfirst($table) . "1";
         $product_name = $request->input('product_name');
         $uploaded_header_eng = $rows[0];
         $column_names = array_shift($rows);
@@ -320,7 +320,7 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'message' => 'Product table not found'], 404);
             }
 
-            $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']);
+            $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
 
             if (!class_exists($modelClass)) {
                 return response()->json(['success' => false, 'message' => 'Model class not found'], 404);
@@ -366,7 +366,7 @@ class ProductController extends Controller
         $posted_data = array_slice($request->input(), 2);
         // dd($posted_data);
         $product = ProductsMst::find($product_id);
-        $table_name = "product_" . $product->table_name . 's';
+        $table_name = "product_" . $product->table_name . '1s';
 
 
         $posted_data_in_array = array_chunk($posted_data, 4, true);
@@ -448,7 +448,7 @@ class ProductController extends Controller
         $elementsToRemove = ['id', 'created_at', 'updated_at'];
         $full_field_names = array_diff($full_field_names, $elementsToRemove);
         $model_name = "Product" . ucfirst($product->table_name);
-        $modelClass = 'App\\Models\\' . $model_name;
+        $modelClass = 'App\\Models\\' . $model_name . '1';
         $model = app($modelClass);
         $model->updateFillable($full_field_names);
 
@@ -566,7 +566,7 @@ class ProductController extends Controller
 
 
         $field_name_db = "telema_" . $fieldName;
-        $table_name = "product_" . $product->table_name . 's';
+        $table_name = "product_" . $product->table_name . '1s';
 
 
         try {

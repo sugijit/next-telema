@@ -8,6 +8,7 @@ function openModal() {
 function openFieldModalAdd() {
     fieldCount = document.querySelectorAll('#field-container1 > div').length; // Count existing fields
     document.getElementById('settingsFieldModalAdd').classList.remove('hidden');
+
 }
 function openFieldModalDelete() {
     fieldCount = document.querySelectorAll('#field-container2 > div').length; // Count existing fields
@@ -52,7 +53,7 @@ function addField() {
     const container = document.getElementById('field-container1');
 
     const fieldHTML = `
-        <div class="flex align-center gap-3 mb-2" id="field-${fieldCount}">
+        <div class="flex align-center gap-3 mb-2 newly-added" id="field-${fieldCount}">
             <p class="pt-1">${fieldCount}</p>
             <input class="text-xs rounded-md placeholder:text-[0.6rem]" type="text" name="field_name_${fieldCount}" placeholder="(英字) 例：result">
             <input class="text-xs rounded-md" type="text" name="field_value_${fieldCount}" placeholder="例：結果">
