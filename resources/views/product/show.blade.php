@@ -244,7 +244,45 @@
                                                         @endif
                                                     </div>
                                                 @endif
-                                                <input class="text-xs px-2 py-1" id="editable-input-{{ $rowIndex }}-{{ $colIndex }}" type="text" style="display:none;" value="{{ $value }}" onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')" />
+
+                                                @php
+                                                if(Str::startsWith($colIndex, "telema")){
+                                                    $fieldKey = str_replace("telema_", "", $colIndex);
+                                                    $field = collect($fields)->firstWhere("field_name_{$fieldKey}", $fieldKey);
+                                                }
+                                                @endphp
+                                                @if (Str::startsWith($colIndex, "telema"))
+
+                                                    @php $prim = 0
+                                                    @endphp
+                                                    @foreach ($fields as $fieldss) 
+                                                        @php $prim = $prim + 1;
+                                                            $fieldTypes = array_filter($fieldss, function ($key) {
+                                                                return strpos($key, 'field_type_') === 0;
+                                                            }, ARRAY_FILTER_USE_KEY);
+                                                        @endphp
+
+                                                                @foreach ($fieldTypes as $key => $valuee) 
+
+                                                                    @if ($fieldKey === reset($fieldss))
+                                                                        @if (array_key_exists($key, $fieldss))
+                                                                                @if ($valuee === 'select') 
+                                                                                    <select class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline" value="{{ $value }}" onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')">
+                                                                                        @if(isset($fieldss["options_{$prim}"]))
+                                                                                            @foreach (explode(',', $fieldss["options_{$prim}"]) as $option)
+                                                                                                <option value="{{ $option }}" {{ $value == $option ? 'selected' : '' }}>{{ $option }}</option>
+                                                                                            @endforeach
+                                                                                        @endif    
+                                                                                    </select>
+                                                                                @else
+                                                                                    <input class="text-xs px-2 py-1" id="editable-input-{{ $rowIndex }}-{{ $colIndex }}" type="text" style="display:none;" value="{{ $value }}" onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')" />
+                                                                                @endif
+                                                                        @endif
+                                                                    @endif
+                                                                @endforeach
+                                                    @endforeach
+                                                @endif
+
                                             </td>
                                         @endforeach
                                     </tr>
