@@ -23,13 +23,16 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $products = ProductsMst::all()->toArray();
+        $user = Auth::user();
+        $company_id = $user->company_id;
+        $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
+        $first_product = ProductsMst::where('company_id', $company_id)->first();
 
         // リストない場合、addをみせる
         if (empty($products)) {
             return view('product.add', compact('products'));
         } else {
-            return redirect()->route('products.show', 1);
+            return redirect()->route('products.show', $first_product->id);
         }
     }
 
@@ -58,7 +61,6 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-
         $product_table = ProductsMst::find($id);
 
         if ($product_table) {
@@ -75,7 +77,9 @@ class ProductController extends Controller
         }
 
 
-        $products = ProductsMst::all()->toArray();
+        $user = Auth::user();
+        $company_id = $user->company_id;
+        $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
 
         $can_views = json_decode($current_list["view"], TRUE);
         $view_settings = json_decode($current_list["view"], TRUE);
@@ -210,7 +214,7 @@ class ProductController extends Controller
         $product_mst = new ProductsMst();
         $product_mst->product_name = $validatedData['product_name'];
         $product_mst->table_name = $validatedData['table_name'];
-        $product_mst->company_id = $user_id;
+        $product_mst->company_id = $user->company_id;
         $product_mst->created_user_id = $user_id;
         $product_mst->view = $product_mst_view;
         $product_mst->header = $full_header_eng_jp_arr;

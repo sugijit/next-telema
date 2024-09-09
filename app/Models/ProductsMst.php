@@ -17,4 +17,9 @@ class ProductsMst extends Model
         'view',
         'custom_fields',
     ];
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
 }
