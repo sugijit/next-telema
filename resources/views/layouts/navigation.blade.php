@@ -22,6 +22,9 @@
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index','users.edit','users.create')">
                             {{ __('ユーザー') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.index','companies.edit','companies.create','companies.show')">
+                            {{ __('登録企業') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>

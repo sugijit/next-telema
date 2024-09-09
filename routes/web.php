@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CompanyController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,6 +21,7 @@ Route::middleware('auth')->group(function () {
 
     // 架電リスト
     Route::resource('products', ProductController::class);
+    Route::resource('companies', CompanyController::class);
     Route::get('/products/{type?}', [ProductController::class, 'index'])->name('products');
     Route::get('/products.add}', [ProductController::class, 'add'])->name('products.add');
     Route::post('/products/upload', [ProductController::class, 'upload'])->name('products.upload');
@@ -29,6 +31,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/product/add-field', [ProductController::class, 'addField'])->name('product.addField');
     Route::post('/products/{productId}/delete-field', [ProductController::class, 'deleteField'])->name('products.deleteField');
     Route::post('/product/update-field', [ProductController::class, 'updateField'])->name('product.updateField');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('companies', CompanyController::class);
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
