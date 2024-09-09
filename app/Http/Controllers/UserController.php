@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 
 class UserController extends Controller
@@ -17,7 +18,13 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = User::all();
+        // $users = User::all();
+        $user = Auth::user();
+        $company_id = $user->company_id;
+        $users = User::where('company_id', $company_id)->get();
+        if($user->role == 'nl_admin') {
+            $users = User::all();
+        }
         return view('users.index', compact('users'));
     }
 
@@ -50,6 +57,10 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        if(!User::isOurUser($user->id)){
+            return view('dashboard');
+        }
+        
         $companies = Company::all();
         return view('users.edit', compact('user','companies'));
     }

@@ -42,11 +42,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/product/update-field', [ProductController::class, 'updateField'])->name('product.updateField');
 });
 
-Route::middleware(['auth','admin'])->group(function () {
+Route::middleware(['auth','nl_admin'])->group(function () {
     Route::resource('companies', CompanyController::class);
 });
 
-Route::middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth','admin'])->group(function () {
     Route::resource('users', UserController::class);
 });
 

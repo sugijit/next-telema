@@ -18,10 +18,12 @@
                     <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.index','products.add','products.show')">
                         {{ __('架電リスト') }}
                     </x-nav-link>
-                    @if(Auth::user()->role === 'admin')
+                    @if(Auth::user()->role === 'admin' || Auth::user()->role === 'nl_admin')
                         <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index','users.edit','users.create')">
                             {{ __('ユーザー') }}
                         </x-nav-link>
+                    @endif
+                    @if(Auth::user()->role === 'nl_admin')
                         <x-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.index','companies.edit','companies.create','companies.show')">
                             {{ __('登録企業') }}
                         </x-nav-link>

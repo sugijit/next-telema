@@ -65,6 +65,10 @@ class ProductController extends Controller
     {
         $product_table = ProductsMst::find($id);
 
+        if(!ProductsMst::isOurProduct($id)){
+            return view('dashboard');
+        }
+
         if ($product_table) {
             if ($product_table['table_name']) {
                 $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
@@ -72,7 +76,9 @@ class ProductController extends Controller
                 $current_list = $product_table->toArray();
             }
         } else {
-            $products = ProductsMst::all()->toArray();
+             $user = Auth::user();
+            $company_id = $user->company_id;
+            $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
             $list_items = [];
             $current_list = [];
             return view('product.add', compact('products', 'current_list'));
