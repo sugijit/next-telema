@@ -44,7 +44,9 @@ class ProductController extends Controller
      */
     public function add()
     {
-        $products = ProductsMst::all()->toArray();
+        $user = Auth::user();
+        $company_id = $user->company_id;
+        $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
         return view('product.add', compact('products'));
     }
 

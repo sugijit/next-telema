@@ -21,7 +21,16 @@ Route::middleware('auth')->group(function () {
 
     // 架電リスト
     Route::resource('products', ProductController::class);
-    Route::resource('companies', CompanyController::class);
+    // Route::resource('companies', CompanyController::class);
+
+    Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
+    Route::get('/companies/create', [CompanyController::class, 'create'])->name('companies.create');
+    Route::post('/companies', [CompanyController::class, 'store'])->name('companies.store');
+    Route::get('/companies/{company}', [CompanyController::class, 'show'])->name('companies.show');
+    Route::get('/companies/{company}/edit', [CompanyController::class, 'edit'])->name('companies.edit');
+    Route::patch('/companies/{company}', [CompanyController::class, 'update'])->name('companies.update');
+    Route::delete('/companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
+
     Route::get('/products/{type?}', [ProductController::class, 'index'])->name('products');
     Route::get('/products.add}', [ProductController::class, 'add'])->name('products.add');
     Route::post('/products/upload', [ProductController::class, 'upload'])->name('products.upload');
@@ -33,7 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/product/update-field', [ProductController::class, 'updateField'])->name('product.updateField');
 });
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth','admin'])->group(function () {
     Route::resource('companies', CompanyController::class);
 });
 
