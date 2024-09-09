@@ -62,6 +62,11 @@ class UserController extends Controller
         }
         
         $companies = Company::all();
+        
+        if ($user->role == 'admin') {
+            $companies = Company::where('id', $user->company_id)->get();
+        }
+
         return view('users.edit', compact('user','companies'));
     }
 
