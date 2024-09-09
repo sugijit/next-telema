@@ -17,6 +17,7 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">会社名</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名前</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">メール</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">役割</th>
@@ -26,6 +27,7 @@
                         <tbody class="bg-white divide-y divide-gray-200">
                             @foreach ($users as $user)
                                 <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">{{ $user->company->name }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">{{ ($user->role === 'admin') ? '管理者' : '一般ユーザー' }}</td>

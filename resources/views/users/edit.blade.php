@@ -13,6 +13,14 @@
                         @csrf
                         @method('PUT')
                         <div class="mb-4">
+                            <label for="company_id" class="block text-gray-700 text-sm font-bold mb-2">会社名:</label>
+                            <select name="company_id" id="company_id" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                                @foreach($companies as $company)
+                                    <option value="{{ $company->id }}" {{ $user->company_id == $company->id ? 'selected' : '' }}>{{ $company->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-4">
                             <label for="name" class="block text-gray-700 text-sm font-bold mb-2">名前:</label>
                             <input type="text" name="name" id="name" value="{{ $user->name }}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                         </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -22,7 +23,8 @@ class UserController extends Controller
 
     public function create()
     {
-        return view('users.create');
+        $companies = Company::all();
+        return view('users.create', compact('companies'));
     }
 
     public function store(Request $request)
@@ -32,6 +34,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|in:user,admin',
+            'company_id' => 'required|exists:companies,id', // Validate company_id
         ]);
 
         User::create([
@@ -39,6 +42,7 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
+            'company_id' => $request->company_id,
         ]);
 
         return redirect()->route('users.index')->with('success', 'User created successfully.');
@@ -46,7 +50,8 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('users.edit', compact('user'));
+        $companies = Company::all();
+        return view('users.edit', compact('user','companies'));
     }
 
     public function update(Request $request, User $user)
