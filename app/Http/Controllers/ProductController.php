@@ -154,7 +154,7 @@ class ProductController extends Controller
 
         $request->validate([
             'csv_file' => 'required|mimes:csv,txt',
-            'table_name' => 'required|string',
+            'table_name' => 'required|string|regex:/^[a-zA-Z0-9_]+$/',
             'product_name' => 'required|string',
         ]);
 
