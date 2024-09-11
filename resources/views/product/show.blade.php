@@ -339,18 +339,18 @@
             </button>
             <h2 class="text-sm font-bold mt-3 !mb-6 border-b pb-3 text-gray-600">絞り込み</h2>
             <form id="filterForm" action="{{ route('product.filter') }}" method="GET">
-                <input type="text" value={{ $id }} class="hidden" name="product_id">
+                <input type="text" value="{{ $id }}" class="hidden" name="product_id">
                 <div class="mb-4">
                     <label for="search_keyword" class="block text-sm font-medium">キーワード <span class="text-[0.5rem]">　※曖昧検索</span></label>
-                    <input type="text" name="search_keyword" id="search_keyword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <input type="text" name="search_keyword" id="search_keyword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ request('search_keyword', '') }}">
                 </div>
                 <div class="mb-4">
                     <label for="date_from" class="block text-sm font-medium">開始日</label>
-                    <input type="date" name="date_from" id="date_from" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <input type="date" name="date_from" id="date_from" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ request('date_from', '') }}">
                 </div>
                 <div class="mb-4">
                     <label for="date_to" class="block text-sm font-medium">終了日</label>
-                    <input type="date" name="date_to" id="date_to" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                    <input type="date" name="date_to" id="date_to" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ request('date_to', '') }}">
                 </div>
                 @if(!empty($selectFields))
                 <div class="w-full md:min-w-[500px] flex flex-wrap gap-2">
@@ -372,7 +372,7 @@
                             <select name="{{$come}}" class="w-full rounded-md border-gray-300 text-xs shadow-sm mt-1">
                                 <option value="">全て</option>
                                     @foreach (explode(',', $field["{$key}"]) as $option)
-                                        <option value="{{ $option }}">
+                                        <option value="{{ $option }}" {{ request($come) == $option ? 'selected' : '' }}>
                                             {{ $option }}
                                         </option>
                                     @endforeach
@@ -385,8 +385,10 @@
                 </div>
                 @endif
                 <div class="text-center mt-4">
+
                     <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">絞り込み</button>
                     <button type="button" onclick="closeFilterModal()" class="ml-2 bg-gray-300 py-2 px-4 rounded">キャンセル</button>
+                    <button type="button" onclick="resetFilters()" class="ml-2 bg-yellow-500 text-white py-2 px-4 rounded">リセット</button>
                 </div>
             </form>
         </div>
@@ -403,6 +405,12 @@
             }
             document.getElementById('filterModal').classList.add('hidden');
         }
+
+        function resetFilters() {
+            const productId = "{{ $id }}"; // Get the product ID
+            window.location.href = `/products/${productId}`; // Redirect to the product page
+        }  
+
     </script>
 
 
