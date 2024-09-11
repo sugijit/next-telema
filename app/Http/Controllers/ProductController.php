@@ -307,7 +307,7 @@ class ProductController extends Controller
         // dd(count($rows[0]));
         foreach ($rows as $row) {
             $data = array_combine($column_names, $row);
-
+            $data['created_at'] = now();
             // ここで既存のデータがあるかチェックし、なければ挿入、あれば更新
             DB::table($tableName)->updateOrInsert($data);
         }

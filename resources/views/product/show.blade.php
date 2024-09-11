@@ -473,7 +473,11 @@
                                                         <a
                                                             href="tel:{{ $value }}">{{ $value == null ? '-' : $value }}</a>
                                                     @else
-                                                        {{ $value == null ? '-' : $value }}
+                                                        @if (($colIndex === 'created_at' || $colIndex === 'updated_at') && $value != null)
+                                                            {{ \Carbon\Carbon::parse($value)->format('Y/m/d H:i') }}
+                                                        @else
+                                                            {{ $value == null ? '-' : $value }}
+                                                        @endif
                                                     @endif
                                                 </div>
                                             @endif
