@@ -344,13 +344,15 @@
                     <label for="search_keyword" class="block text-sm font-medium">キーワード <span class="text-[0.5rem]">　※曖昧検索</span></label>
                     <input type="text" name="search_keyword" id="search_keyword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ request('search_keyword', '') }}">
                 </div>
-                <div class="mb-4">
-                    <label for="date_from" class="block text-sm font-medium">開始日</label>
-                    <input type="date" name="date_from" id="date_from" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ request('date_from', '') }}">
-                </div>
-                <div class="mb-4">
-                    <label for="date_to" class="block text-sm font-medium">終了日</label>
-                    <input type="date" name="date_to" id="date_to" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ request('date_to', '') }}">
+                <div class="flex gap-3">
+                    <div class="mb-4">
+                        <label for="date_from" class="block text-sm font-medium">開始日</label>
+                        <input type="date" name="date_from" id="date_from" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ request('date_from', '') }}">
+                    </div>
+                    <div class="mb-4">
+                        <label for="date_to" class="block text-sm font-medium">終了日</label>
+                        <input type="date" name="date_to" id="date_to" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ request('date_to', '') }}">
+                    </div>
                 </div>
                 @if(!empty($selectFields))
                 <div class="w-full md:min-w-[500px] flex flex-wrap gap-2">
