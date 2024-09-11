@@ -158,6 +158,11 @@ class ProductController extends Controller
             'product_name' => 'required|string',
         ]);
 
+        // テーブル名がダブらないように
+        $existingProduct = ProductsMst::where('table_name', $request->input('table_name'))->first();
+        if ($existingProduct) {
+            return redirect()->back()->with('error', 'このテーブル名は既に存在します。別の名前を使用してください。');
+        }
 
         $file = $request->file('csv_file');
         $filePath = $file->getRealPath();
