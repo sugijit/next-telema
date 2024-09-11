@@ -107,10 +107,22 @@ class ProductController extends Controller
 
         $fields = json_decode($product_table->custom_fields, TRUE);
         $fields = $fields ? $fields : [];
-        // dd($fields);
+        // dd(session('products', []));
+
+        // $list_items = session('products', []);
+        $selectFields = [];
+        $selectFields = array_filter($fields, function ($item) {
+            foreach ($item as $key => $value) {
+                if (strpos($key, 'field_type') === 0 && $value === 'select') {
+                    return true;
+                }
+            }
+            return false;
+        });
+        // dd($selectFields);
 
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields'));
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields'));
     }
 
     /**
@@ -650,4 +662,94 @@ class ProductController extends Controller
 
         return redirect()->route('products.show', $product->id)->with('success', 'フィールドが更新されました。');
     }
+
+
+
+
+        public function filter(Request $request)
+    {
+
+        $product_table = ProductsMst::find($request->input('product_id'));
+
+        if(!ProductsMst::isOurProduct($request->input('product_id'))){
+            return view('dashboard');
+        }
+
+        $fields = json_decode($product_table->custom_fields, TRUE);
+        $fields = $fields ? $fields : [];
+        $selectFields = array_filter($fields, function ($item) {
+            foreach ($item as $key => $value) {
+                if (strpos($key, 'field_type') === 0 && $value === 'select') {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        if ($product_table) {
+            if ($product_table['table_name']) {
+                $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
+                $list_items = $modelClass::all()->toArray();
+                $query = $modelClass::query();
+                if ($request->filled('date_from')) {
+                    $query->where('updated_at', '>=', $request->input('date_from'));
+                }
+                if ($request->filled('date_to')) {
+                    $query->where('updated_at', '<', $request->input('date_to') . ' 23:59:59');
+                }
+
+                foreach ($selectFields as $key => $value) {
+                    foreach($value as $keyy =>$val) {
+                        if ($request->filled($val)) {
+                            $query->where("telema_".$val, 'LIKE', '%' . $request->input($val) . '%');
+                        }
+                    }
+                };
+
+                if ($request->filled('search_keyword')) {
+                    $columns = Schema::getColumnListing("product_" . $product_table['table_name'] . "1s");
+                    $search_keyword = $request->input('search_keyword');
+                    foreach ($columns as $column) {
+                        $query->orWhere($column, 'LIKE', "%{$search_keyword}%");
+                    }
+                }
+
+
+                $list_items = $query->get()->toArray();
+                $current_list = $product_table->toArray();
+            }
+        } else {
+             $user = Auth::user();
+            $company_id = $user->company_id;
+            $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
+            $list_items = [];
+            $current_list = [];
+            return view('product.add', compact('products', 'current_list'));
+        }
+
+
+        $user = Auth::user();
+        $company_id = $user->company_id;
+        $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
+
+        $can_views = json_decode($current_list["view"], TRUE);
+        $view_settings = json_decode($current_list["view"], TRUE);
+        $header = json_decode($current_list["header"], TRUE);
+        $hard_header = json_decode($current_list["header"], TRUE);
+
+        foreach ($can_views as $key => $can_view) {
+
+            if ($can_view == 0) {
+                unset($header[$key]);
+                foreach ($list_items as $a => &$item) {
+                    unset($item[$key]);
+                }
+                unset($item);
+            }
+        }
+
+        $id = $request->input('product_id');
+
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields'));
+        }
 }

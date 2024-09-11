@@ -328,6 +328,85 @@
             </form>
         </div>
     </div>
+
+    {{-- 絞り込みモーダル --}}
+    <div id="filterModal"
+        class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]"
+        onclick="closeFilterModal(event)">
+        <div class="bg-white p-6 rounded-xl shadow-lg relative" onclick="event.stopPropagation()">
+            <button onclick="closeFilterModal()" class="text-xl absolute top-3 right-6 text-gray-500 hover:text-gray-700">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h2 class="text-sm font-bold mt-3 !mb-6 border-b pb-3 text-gray-600">絞り込み</h2>
+            <form id="filterForm" action="{{ route('product.filter') }}" method="GET">
+                <input type="text" value={{ $id }} class="hidden" name="product_id">
+                <div class="mb-4">
+                    <label for="search_keyword" class="block text-sm font-medium">キーワード <span class="text-[0.5rem]">　※曖昧検索</span></label>
+                    <input type="text" name="search_keyword" id="search_keyword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                </div>
+                <div class="mb-4">
+                    <label for="date_from" class="block text-sm font-medium">開始日</label>
+                    <input type="date" name="date_from" id="date_from" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                </div>
+                <div class="mb-4">
+                    <label for="date_to" class="block text-sm font-medium">終了日</label>
+                    <input type="date" name="date_to" id="date_to" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                </div>
+                @if(!empty($selectFields))
+                <div class="w-full md:min-w-[500px] flex flex-wrap gap-2">
+                    @foreach ($selectFields as $field)
+                        <div class="mb-4 flex-1 w-full md:w-1/3">
+                            <label for="custom_field" class="block text-sm font-medium">
+                                @foreach ($field as $key => $value)
+                                    @if (strpos($key, 'field_value') !== false)
+                                            {{ $value }}
+                                    @endif
+                                    @if (strpos($key, 'field_name') !== false)
+                                            @php 
+                                                $come = $value ;
+                                            @endphp
+                                    @endif
+                                @endforeach
+                            </label>
+                            
+                            <select name="{{$come}}" class="w-full rounded-md border-gray-300 text-xs shadow-sm mt-1">
+                                <option value="">全て</option>
+                                    @foreach (explode(',', $field["{$key}"]) as $option)
+                                        <option value="{{ $option }}">
+                                            {{ $option }}
+                                        </option>
+                                    @endforeach
+                            </select>
+                        </div>
+                        @if (($loop->index + 1) % 3 === 0) <!-- 3列ごとに改行 -->
+                            </div><div class="w-full flex flex-wrap gap-2">
+                        @endif
+                    @endforeach
+                </div>
+                @endif
+                <div class="text-center mt-4">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">絞り込み</button>
+                    <button type="button" onclick="closeFilterModal()" class="ml-2 bg-gray-300 py-2 px-4 rounded">キャンセル</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openFilterModal() {
+            document.getElementById('filterModal').classList.remove('hidden');
+        }
+
+        function closeFilterModal(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            document.getElementById('filterModal').classList.add('hidden');
+        }
+    </script>
+
+
+
     {{-- フィールドモーダル  DELETE --}}
     <div id="settingsFieldModalDelete"
         class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]"
@@ -411,6 +490,7 @@
 
                 <div class="p-6 !pt-0 bg-white border-b border-gray-200">
                     <div class="mb-4 flex justify-end gap-3">
+                        <button onclick="openFilterModal()"><i class="text-sm fa-solid fa-filter text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　絞り込み</i></button>
                         <button id="settings_button" onclick="openModal()"><i
                                 class="text-sm fa-solid fa-gear text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示設定</i></button>
                         <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
