@@ -490,6 +490,8 @@
 
                 <div class="p-6 !pt-0 bg-white border-b border-gray-200">
                     <div class="mb-4 flex justify-end gap-3">
+                        <button onclick="downloadCSV()" ><i class="text-sm fa-solid fa-download text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded">　ダウンロード</i></button>
+
                         <button onclick="openFilterModal()"><i class="text-sm fa-solid fa-filter text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　絞り込み</i></button>
                         <button id="settings_button" onclick="openModal()"><i
                                 class="text-sm fa-solid fa-gear text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示設定</i></button>
@@ -760,4 +762,14 @@
         }
     </script>
     <script src="{{ asset('/js/modals.js') }}"></script>
+    <script>
+       function downloadCSV() {
+        const id = "{{ $id }}"; // Get the product ID
+        const urlParams = new URLSearchParams(window.location.search); // 現在のURLのクエリパラメータを取得
+
+        // 新しいURLを作成
+        const downloadUrl = `/products/${id}/download-csv?${urlParams.toString()}`;
+        window.location.href = downloadUrl; // Redirect to the download URL
+        }
+    </script>
 </x-app-layout>

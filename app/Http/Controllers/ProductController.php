@@ -752,4 +752,96 @@ class ProductController extends Controller
 
         return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields'));
         }
+
+
+        public function downloadCSV($id, Request $request)
+        {
+            $product_table = ProductsMst::find($id);
+            $queryParams = $request->query(); 
+
+            $downloadHeader = $this->getDownloadHeader($id);
+            $downloadItems = $this->getDownloadItems($id, $queryParams);
+            
+            $csvFileName = $product_table->product_name . '_' . now() . '.csv';
+            $handle = fopen('php://output', 'w');
+            header('Content-Type: text/csv');
+            header('Content-Disposition: attachment; filename="' . $csvFileName . '"');
+
+            fputcsv($handle, $downloadHeader); 
+            foreach ($downloadItems as $item) {
+                fputcsv($handle, $item); 
+            }
+
+            fclose($handle);
+            exit;
+        }
+
+        public function getDownloadHeader($id) {
+            $all_header = ProductsMst::find($id)->header;
+            $all_header = json_decode($all_header, TRUE);
+
+            $filtered_header = ProductsMst::find($id)->view;
+            $filtered_header = json_decode($filtered_header, TRUE);
+
+            $downloadHeader = [];
+            foreach ($filtered_header as $key => $value) {
+                if ($value == "1" && isset($all_header[$key])) {
+                    $downloadHeader[$key] = $all_header[$key];
+                }
+            }
+
+            return $downloadHeader;
+        }
+
+
+        public function getDownloadItems($id, $queryParams) {
+            $product_table = ProductsMst::find($id);
+            $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
+            $query = $modelClass::query();
+
+
+            
+            if(!empty($queryParams)) {
+                // filteriiiiingggggggggg
+                    $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
+                    $list_items = $modelClass::all()->toArray();
+                    $query = $modelClass::query();
+                    if (isset($queryParams['date_from']) && $queryParams['date_from']) {
+                        $query->where('updated_at', '>=', $queryParams['date_from']);
+                    }
+                    if (isset($queryParams['date_to']) && $queryParams['date_to']) {
+                        $query->where('updated_at', '<', $queryParams['date_to'] . ' 23:59:59');
+                    }
+                    if ($queryParams['search_keyword']) {
+                        $columns = Schema::getColumnListing("product_" . $product_table['table_name'] . "1s");
+                        $search_keyword = $queryParams['search_keyword'];
+                        foreach ($columns as $column) {
+                            $query->orWhere($column, 'LIKE', "%{$search_keyword}%");
+                        }
+                    }
+
+                    array_splice($queryParams, 0, 4);
+                    foreach($queryParams as $key => $queryParam){
+                        if($queryParam){
+                            $query->where("telema_" . $key, 'LIKE', $queryParam);
+                        }
+                    }
+
+                    $list_items = $query->get()->toArray();
+                // filteriiiiingggggggggg
+            } else {
+                $list_items = $modelClass::all()->toArray();
+            }
+
+            $downloadHeader = $this->getDownloadHeader($id);
+
+            $listItems = [];
+
+            foreach ($list_items as $record) {
+                $filtered = array_intersect_key($record, $downloadHeader);
+                $listItems[] = $filtered;
+            }
+
+            return $listItems;
+        }
 }

@@ -42,6 +42,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/product/update-field', [ProductController::class, 'updateField'])->name('product.updateField');
 
     Route::get('/product/filter', [ProductController::class, 'filter'])->name('product.filter');
+
+    Route::get('/products/{id}/download-csv', [ProductController::class, 'downloadCSV'])->name('product.downloadCSV');
 });
 
 Route::middleware(['auth','nl_admin'])->group(function () {
