@@ -18,21 +18,21 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">会社名</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名前</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">メール</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">役割</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">会社名</th>
+                                <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">名前</th>
+                                <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">メール</th>
+                                <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">役割</th>
+                                <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">操作</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @foreach ($users as $user)
                                 <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $user->company->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $user->name }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">{{ $user->email }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm">{{ ($user->role === 'admin') ? '管理者' : '一般ユーザー' }}</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm">{{ $user->company->name }}</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm">{{ $user->name }}</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-sm">{{ $user->email }}</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-xs">{{ ($user->role === 'admin') ? '管理者' : '一般ユーザー' }}</td>
+                                    <td class="px-6 py-2 whitespace-nowrap text-xs font-medium">
                                         <a href="{{ route('users.edit', $user) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">変更</a>
                                         <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline-block">
                                             @csrf

@@ -161,7 +161,7 @@ class ProductController extends Controller
         // テーブル名がダブらないように
         $existingProduct = ProductsMst::where('table_name', $request->input('table_name'))->first();
         if ($existingProduct) {
-            return redirect()->back()->with('error', 'このテーブル名は既に存在します。別の名前を使用してください。');
+            return redirect()->back()->with('error', '同じ英語のリスト名が存在します。別の英語の名前を使用してください。後ろに数字入れる事もできます。');
         }
 
         $file = $request->file('csv_file');
@@ -859,7 +859,7 @@ class ProductController extends Controller
         }
 
 
-        
+
         public function delete($id)
         {
             $product = ProductsMst::findOrFail($id);

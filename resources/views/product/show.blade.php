@@ -800,7 +800,7 @@
                 .then(data => {
                     if (data.success) {
                         alert('削除が成功しました');
-                        window.location.reload(); // Reload the page to reflect changes
+                        window.location.href = '/products'; // Reload the page to reflect changes
                     } else {
                         alert('削除に失敗しました');
                     }
