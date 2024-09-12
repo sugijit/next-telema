@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\ProductsMst;
+use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 
 use function PHPUnit\Framework\isEmpty;
@@ -69,10 +70,15 @@ class ProductController extends Controller
             return view('dashboard');
         }
 
+        // dd($product_table['table_name']);
+
         if ($product_table) {
             if ($product_table['table_name']) {
-                $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
-                $list_items = $modelClass::all()->toArray();
+
+                $productModel = new Product();
+                $productModel->setTableName('product_'.$product_table['table_name'] . '1s')->get();
+                $list_items = $productModel->get()->toArray(); 
+
                 $current_list = $product_table->toArray();
             }
         } else {
@@ -232,11 +238,11 @@ class ProductController extends Controller
             return back();
         }
         // モデル生成
-        try {
-            $this->createModel($model_name, $table_full_columns);
-        } catch (Exception $e) {
-            return back();
-        }
+        // try {
+        //     $this->createModel($model_name, $table_full_columns);
+        // } catch (Exception $e) {
+        //     return back();
+        // }
         // products_msts table マスター登録
         $user = Auth::user();
         $user_id = $user->id;
@@ -357,7 +363,8 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'message' => 'Product table not found'], 404);
             }
 
-            $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
+            $modelClass = new Product();
+            $modelClass->setTableName('product_'.$product_table['table_name'] . '1s')->get();
 
             if (!class_exists($modelClass)) {
                 return response()->json(['success' => false, 'message' => 'Model class not found'], 404);
@@ -481,13 +488,16 @@ class ProductController extends Controller
         }
 
         // モデルに追記 $fillable
-        $full_field_names = Schema::getColumnListing($table_name);
-        $elementsToRemove = ['id', 'created_at', 'updated_at'];
-        $full_field_names = array_diff($full_field_names, $elementsToRemove);
-        $model_name = "Product" . ucfirst($product->table_name);
-        $modelClass = 'App\\Models\\' . $model_name . '1';
-        $model = app($modelClass);
-        $model->updateFillable($full_field_names);
+        // $full_field_names = Schema::getColumnListing($table_name);
+        // $elementsToRemove = ['id', 'created_at', 'updated_at'];
+        // $full_field_names = array_diff($full_field_names, $elementsToRemove);
+        // $model_name = "Product" . ucfirst($product->table_name);
+        // $modelClass = 'App\\Models\\' . $model_name . '1';
+
+        // $modelClass = new Product();
+        // $modelClass->setTableName('product_'.ucfirst($product->table_name) . '1s')->get();
+        // $model = app($modelClass);
+        // $model->updateFillable($full_field_names);
 
         // ProductsMstsにフォーム情報を追加
         $posted_data_in_array = array_chunk($posted_data, 4, true);
@@ -699,38 +709,45 @@ class ProductController extends Controller
             return false;
         });
 
-        if ($product_table) {
-            if ($product_table['table_name']) {
-                $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
-                $list_items = $modelClass::all()->toArray();
-                $query = $modelClass::query();
-                if ($request->filled('date_from')) {
-                    $query->where('updated_at', '>=', $request->input('date_from'));
-                }
-                if ($request->filled('date_to')) {
-                    $query->where('updated_at', '<', $request->input('date_to') . ' 23:59:59');
-                }
+        $modelClass = new Product();
+        $modelClass->setTableName('product_'.$product_table['table_name'] . '1s')->get();
 
-                foreach ($selectFields as $key => $value) {
-                    foreach($value as $keyy =>$val) {
-                        if ($request->filled($val)) {
-                            $query->where("telema_".$val, 'LIKE', '%' . $request->input($val) . '%');
-                        }
-                    }
-                };
-
-                if ($request->filled('search_keyword')) {
-                    $columns = Schema::getColumnListing("product_" . $product_table['table_name'] . "1s");
-                    $search_keyword = $request->input('search_keyword');
-                    foreach ($columns as $column) {
-                        $query->orWhere($column, 'LIKE', "%{$search_keyword}%");
-                    }
-                }
-
-
-                $list_items = $query->get()->toArray();
-                $current_list = $product_table->toArray();
+        if ($product_table['table_name']) {
+            $modelClass = new Product();
+            $modelClass->setTableName('product_'.$product_table['table_name'] . '1s')->get();
+            $query = $modelClass::query();
+    
+            // Apply date filters
+            if ($request->filled('date_from')) {
+                $query->where('updated_at', '>=', $request->input('date_from'));
             }
+            if ($request->filled('date_to')) {
+                $query->where('updated_at', '<', $request->input('date_to') . ' 23:59:59');
+            }
+    
+            // Apply select field filters
+            foreach ($selectFields as $key => $value) {
+                foreach($value as $keyy => $val) {
+                    if ($request->filled($val)) {
+                        $query->where("telema_".$val, 'LIKE', '%' . $request->input($val) . '%');
+                    }
+                }
+            }
+    
+            // Apply search keyword filter
+            if ($request->filled('search_keyword')) {
+                $columns = Schema::getColumnListing("product_" . $product_table['table_name'] . "1s");
+                $search_keyword = $request->input('search_keyword');
+                foreach ($columns as $column) {
+                    $query->orWhere($column, 'LIKE', "%{$search_keyword}%");
+                }
+            }
+    
+            // dd($query);
+            // Execute the query
+            $list_items = $query->from('product_'.$product_table['table_name'] . '1s')->get()->toArray();
+            $current_list = $product_table->toArray();
+        
         } else {
              $user = Auth::user();
             $company_id = $user->company_id;
@@ -809,15 +826,18 @@ class ProductController extends Controller
 
         public function getDownloadItems($id, $queryParams) {
             $product_table = ProductsMst::find($id);
-            $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
+            $modelClass = new Product();
+            $modelClass->setTableName('product_'.$product_table['table_name'] . '1s')->get();
             $query = $modelClass::query();
 
 
             
             if(!empty($queryParams)) {
                 // filteriiiiingggggggggg
-                    $modelClass = 'App\Models\Product' . ucfirst($product_table['table_name']) . '1';
-                    $list_items = $modelClass::all()->toArray();
+                $modelClass = new Product();
+                $modelClass->setTableName('product_'.$product_table['table_name'] . '1s')->get();
+                $query = $modelClass::query();
+                    $list_items = $modelClass::get()->toArray();
                     $query = $modelClass::query();
                     if (isset($queryParams['date_from']) && $queryParams['date_from']) {
                         $query->where('updated_at', '>=', $queryParams['date_from']);
@@ -843,7 +863,10 @@ class ProductController extends Controller
                     $list_items = $query->get()->toArray();
                 // filteriiiiingggggggggg
             } else {
-                $list_items = $modelClass::all()->toArray();
+                $modelClass = new Product();
+                $modelClass->setTableName('product_'.$product_table['table_name'] . '1s')->get();
+                $query = $modelClass::query();
+                $list_items = $modelClass->get()->toArray();
             }
 
             $downloadHeader = $this->getDownloadHeader($id);
