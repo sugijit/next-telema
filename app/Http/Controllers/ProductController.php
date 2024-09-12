@@ -857,4 +857,14 @@ class ProductController extends Controller
 
             return $listItems;
         }
+
+
+        
+        public function delete($id)
+        {
+            $product = ProductsMst::findOrFail($id);
+            $product->delete(); // Soft delete
+
+            return response()->json(['success' => true]);
+        }
 }

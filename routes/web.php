@@ -44,6 +44,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/product/filter', [ProductController::class, 'filter'])->name('product.filter');
 
     Route::get('/products/{id}/download-csv', [ProductController::class, 'downloadCSV'])->name('product.downloadCSV');
+
+    Route::delete('/products/{id}/delete', [ProductController::class, 'delete'])->name('product.delete');
 });
 
 Route::middleware(['auth','nl_admin'])->group(function () {

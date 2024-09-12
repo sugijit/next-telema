@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductsMst extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'product_name',
@@ -17,6 +19,7 @@ class ProductsMst extends Model
         'created_user_id',
         'view',
         'custom_fields',
+        'deleted_at',
     ];
 
     public function company()

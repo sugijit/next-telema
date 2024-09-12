@@ -528,6 +528,9 @@
                                 </li>
                             </ul>
                         </div>
+                        <button id="delete_button" onclick="confirmDelete()">
+                            <i class="text-sm fa-solid fa-trash text-white bg-red-500 hover:bg-red-700 py-2 px-4 rounded">　削除</i>
+                        </button>
                     </div>
 
                     <div class="overflow-scroll !h-[650px]">
@@ -780,6 +783,33 @@
         // 新しいURLを作成
         const downloadUrl = `/products/${id}/download-csv?${urlParams.toString()}`;
         window.location.href = downloadUrl; // Redirect to the download URL
+        }
+    </script>
+
+    <script>
+        function confirmDelete() {
+            if (confirm('本当に削除してもいいですか？')) {
+                const productId = "{{ $id }}"; // Get the product ID
+                fetch(`/products/${productId}/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('削除が成功しました');
+                        window.location.reload(); // Reload the page to reflect changes
+                    } else {
+                        alert('削除に失敗しました');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('エラーが発生しました');
+                });
+            }
         }
     </script>
 </x-app-layout>
