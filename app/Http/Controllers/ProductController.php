@@ -193,6 +193,14 @@ class ProductController extends Controller
         $product_name = $request->input('product_name');
         $uploaded_header_eng = $rows[0];
         $column_names = array_shift($rows);
+        // dd($column_names);
+
+        foreach ($column_names as $column_name){
+            if (!preg_match('/^(?=.*[a-zA-Z_])[a-zA-Z0-9_]+$/', $column_name)) {
+                return redirect()->back()->with('error', 'csvファイルの2行目を全てローマ字で書いてください');
+            }
+        }
+
         $table_full_columns = $column_names;
 
         // 表示非表示用に生成 productsmstsに登録
