@@ -303,6 +303,8 @@
                                         </option>
                                         <option value="select" {{ $value === 'select' ? 'selected' : '' }}>選択式
                                         </option>
+                                        <option value="date" {{ $value === 'date' ? 'selected' : '' }}>日付
+                                        </option>
                                     </select>
                                     <div id="options-container-{{ $currentFieldIndex }}"
                                         class="{{ $value === 'select' ? '' : 'hidden' }}">
@@ -620,6 +622,15 @@
                                                                             @endforeach
                                                                         @endif
                                                                     </select>
+                                                                @elseif($valuee === 'date')
+                                                                    <input type="date"
+                                                                    id="editable-date-{{ $rowIndex }}-{{ $colIndex }}"
+                                                                    class="text-xs block w-full bg-white border border-gray-400 hover:border-gray-500 px-2 py-2 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                                                                    value="{{ $value }}"
+                                                                    onchange="saveDateChanges({{ $rowIndex }}, '{{ $colIndex }}')"
+                                                                    onblur="saveDateChanges({{ $rowIndex }}, '{{ $colIndex }}')"
+                                                                    onkeydown="handleKeyDown(event, {{ $rowIndex }}, '{{ $colIndex }}')" />
+
                                                                 @else
                                                                     <div id="editable-text-{{ $rowIndex }}-{{ $colIndex }}"
                                                                         class="editable p-0"
@@ -659,6 +670,38 @@
             textDiv.style.display = 'none';
             inputField.style.display = 'block';
             inputField.focus();
+        }
+
+        function saveDateChanges(rowIndex, colIndex) {
+            const id = "{{ $id }}"; // Get the product ID
+            const inputField = document.getElementById(`editable-date-${rowIndex}-${colIndex}`);
+            const newValue = inputField.value;
+
+            fetch('/update-cell', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    rowIndex: rowIndex,
+                    colIndex: colIndex,
+                    value: newValue,
+                    id: id,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Optionally update the UI to reflect the new value
+                } else {
+                    alert('変更の保存に失敗しました');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('エラーが発生しました');
+            });
         }
 
         function saveChanges(rowIndex, colIndex) {

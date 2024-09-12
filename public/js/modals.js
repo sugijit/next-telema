@@ -60,6 +60,7 @@ function addField() {
             <select class="text-xs rounded-md" name="field_type_${fieldCount}" onchange="toggleOptions(${fieldCount}, this)">
                 <option value="text">テキスト式</option>
                 <option value="select">選択式</option>
+                <option value="date">日付</option>
             </select>
             <div id="options-container1-${fieldCount}" class="hidden">
                 <input class="text-xs rounded-md" type="text" name="options_${fieldCount}" placeholder="選択肢 (カンマで区切る)">
