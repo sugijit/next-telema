@@ -837,7 +837,7 @@ class ProductController extends Controller
                 $modelClass = new Product();
                 $modelClass->setTableName('product_'.$product_table['table_name'] . '1s')->get();
                 $query = $modelClass::query();
-                    $list_items = $modelClass::get()->toArray();
+                $list_items = $query->from('product_'.$product_table['table_name'] . '1s')->get()->toArray();
                     $query = $modelClass::query();
                     if (isset($queryParams['date_from']) && $queryParams['date_from']) {
                         $query->where('updated_at', '>=', $queryParams['date_from']);
@@ -859,8 +859,8 @@ class ProductController extends Controller
                             $query->where("telema_" . $key, 'LIKE', $queryParam);
                         }
                     }
-
-                    $list_items = $query->get()->toArray();
+                    $list_items = $query->from('product_'.$product_table['table_name'] . '1s')->get()->toArray();
+                    // $list_items = $query->get()->toArray();
                 // filteriiiiingggggggggg
             } else {
                 $modelClass = new Product();
