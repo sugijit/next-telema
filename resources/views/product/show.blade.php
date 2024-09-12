@@ -270,6 +270,7 @@
             </form>
         </div>
     </div>
+    
     {{-- フィールドモーダル 変更 --}}
     <div id="settingsFieldModalUpdate"
         class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]"
@@ -348,11 +349,12 @@
                 </div>
                 <div class="flex gap-3">
                     <div class="mb-4">
-                        <label for="date_from" class="block text-sm font-medium">開始日</label>
+                        <label for="date_from" class="block text-sm font-medium">更新日</label>
                         <input type="date" name="date_from" id="date_from" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ request('date_from', '') }}">
                     </div>
+                    <div class="pt-2"><div>　</div><div>〜</div></div>
                     <div class="mb-4">
-                        <label for="date_to" class="block text-sm font-medium">終了日</label>
+                        <label for="date_to" class="block text-sm font-medium">　 </label>
                         <input type="date" name="date_to" id="date_to" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" value="{{ request('date_to', '') }}">
                     </div>
                 </div>
