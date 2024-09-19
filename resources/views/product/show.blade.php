@@ -450,11 +450,11 @@
                         <button onclick="openFilterModal()"><i class="text-sm fa-solid fa-filter text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　絞り込み</i></button>
                         <button id="settings_button" onclick="openModal()"><i
                                 class="text-sm fa-solid fa-eye text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示設定</i></button>
-                        <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
+                        {{-- <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
                             class="text-white bg-blue-500 hover:bg-blue-700 rounded text-sm px-4 py-2 text-center inline-flex items-center"
                             type="button"><strong>フィールド設定　 </strong><i
                                 class="ml-2 fa-solid fa-circle-chevron-down"></i>
-                        </button>
+                        </button> --}}
                         <div id="dropdown"
                             class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
@@ -508,7 +508,7 @@
                                                     @endphp
 
                                                     @if ($isValidPhoneNumber)
-                                                        <a class=""
+                                                        <a class="" id="editable-phone-{{ $rowIndex }}-{{ $colIndex }}" onclick="calledChanges({{ $rowIndex }}, '{{ $colIndex }}')"
                                                             href="tel:{{ $value }}" >{{ $value == null ? '-' : $value }}</a>
                                                     @else
                                                         @if (($colIndex === 'created_at' || $colIndex === 'updated_at') && $value != null)
@@ -784,6 +784,7 @@
         }
     </script>
     <script src="{{ asset('/js/modals.js') }}"></script>
+
     <script>
        function downloadCSV() {
         const id = "{{ $id }}"; // Get the product ID
@@ -821,4 +822,49 @@
             }
         }
     </script>
+
+    {{-- 架電 --}}
+    <script>
+        function calledChanges(rowIndex, colIndex) {
+            if (!confirm("電話をかけてもいいですか？")) {
+                return;
+            }
+            const id = "{{ $id }}";
+            const user_name = "{{ $user->name }}";
+            const phone_ahref = document.getElementById(`editable-phone-${rowIndex }-${colIndex }`);
+            console.log(user_name)
+            console.log(phone_ahref)
+            const phone_number = phone_ahref.textContent;
+
+            console.log(`'utasnii dugaar:' + ${phone_number}`);
+
+            fetch('/called-change', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        rowIndex: rowIndex,
+                        colIndex: colIndex,
+                        id: id,
+                        user_name: user_name,
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('yeeey')
+                    } else {
+                        alert('変更の保存に失敗しました');
+                    }
+                   
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('エラーが発生しました');
+                });
+        }
+    </script>
+
 </x-app-layout>

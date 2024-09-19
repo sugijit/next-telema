@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/products/upload', [ProductController::class, 'upload'])->name('products.upload');
 
     Route::post('/update-cell', [ProductController::class, 'updateCell'])->name('updateCell');
+    Route::post('/called-change', [ProductController::class, 'calledChange'])->name('calledChange');
     Route::post('/product/can-view', [ProductController::class, 'canView'])->name('product.canView');
     Route::post('/product/add-field', [ProductController::class, 'addField'])->name('product.addField');
     Route::post('/products/{productId}/delete-field', [ProductController::class, 'deleteField'])->name('products.deleteField');

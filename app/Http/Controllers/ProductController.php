@@ -932,4 +932,35 @@ class ProductController extends Controller
             return response()->json(['success' => true]);
         }
 
+
+        public function calledChange(Request $request){
+            try {
+                $rowIndex = $request->input('rowIndex');
+                $colIndex = $request->input('colIndex');
+                $user_name = $request->input('user_name');
+                $productId = $request->input('id');
+    
+                $product_table = ProductsMst::find($productId);
+    
+                $productModel = new Product();
+                $productModel->setTableName('product_'.$product_table['table_name'] . '1s')->get();
+                $products = $productModel->get(); 
+
+                $product = $products[$rowIndex];
+
+                if($product->telema_count == null){
+                    $product->telema_count = 0;
+                }
+                $product->telema_count = $product->telema_count + 1;
+                $product->telema_last_called_agent = $user_name;
+                $product->telema_call_last_date = now();
+                $product->save();
+    
+                return response()->json(['success' => true]);
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+
+        }
+
 }
