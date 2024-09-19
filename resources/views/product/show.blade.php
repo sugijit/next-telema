@@ -543,10 +543,10 @@
                                 <tr>
                                     @foreach ($header as $head)
                                         @if ($head == 'id' || $head == 'ids' || $head == 'server_color')
-                                            <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase"
+                                            <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap"
                                                 ondblclick="resizeTable()">{{ $head }}</th>
                                         @else
-                                            <th class="px-3 py-3 w-full text-left text-xs font-medium text-gray-500 uppercase min-w-24"
+                                            <th class="px-3 py-3 w-full text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap"
                                                 ondblclick="resizeTable()">{{ $head }}</th>
                                         @endif
                                     @endforeach
@@ -554,14 +554,14 @@
                                     <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase">NEXTLINK</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
+                            <tbody class="bg-white divide-y divide-gray-200 static">
                                 @foreach ($list_items as $rowIndex => $list_item)
                                     <tr class="odd:bg-white even:bg-gray-50">
                                         @foreach ($list_item as $colIndex => $value)
                                             @if (Str::startsWith($colIndex, 'telema'))
-                                                <td class="px-3 py-2 whitespace-nowrap bg-green-50 text-xs">
-                                                @else
-                                                <td class="px-3 py-2 whitespace-nowrap text-xs">
+                                                <td class="px-3 py-0 whitespace-nowrap bg-green-50 text-xs h-2">
+                                            @else
+                                                <td class="px-3 py-0 whitespace-nowrap text-xs">
                                             @endif
                                             @if (!Str::startsWith($colIndex, 'telema'))
                                                 <div>
@@ -571,8 +571,8 @@
                                                     @endphp
 
                                                     @if ($isValidPhoneNumber)
-                                                        <a
-                                                            href="tel:{{ $value }}">{{ $value == null ? '-' : $value }}</a>
+                                                        <a class=""
+                                                            href="tel:{{ $value }}" >{{ $value == null ? '-' : $value }}</a>
                                                     @else
                                                         @if (($colIndex === 'created_at' || $colIndex === 'updated_at') && $value != null)
                                                             {{ \Carbon\Carbon::parse($value)->format('Y/m/d H:i') }}
@@ -614,45 +614,65 @@
                                                                 @if ($valuee === 'select')
                                                                     <select
                                                                         id="editable-select-{{ $rowIndex }}-{{ $colIndex }}"
-                                                                        class="text-xs block appearance-none min-w-32 w-full bg-white border border-gray-400 hover:border-gray-500 px-2 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                                                                        class="!text-xs block appearance-none min-w-28 w-full bg-white border border-gray-400 hover:border-gray-500 px-2 py-1 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
                                                                         value="{{ $value }}"
                                                                         onchange="saveChangesSelect({{ $rowIndex }}, '{{ $colIndex }}')">
                                                                         @if (isset($fieldss["options_{$prim}"]))
                                                                             <option value=""></option>
-                                                                            @foreach (explode(',', $fieldss["options_{$prim}"]) as $option)
-                                                                                <option value="{{ $option }}"
-                                                                                    {{ $value == $option ? 'selected' : '' }}>
-                                                                                    {{ $option }}</option>
-                                                                            @endforeach
+                                                                            @if($key == 'field_type_2' && $user->role == 'user')
+                                                                                @if($value == $user->name)
+                                                                                    @foreach ([$user->name] as $option)
+                                                                                    <option value="{{ $option }}" class="!text-xs"
+                                                                                            {{ $value == $option ? 'selected' : $value }}>
+                                                                                            {{ $option }}
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                @elseif(!isset($value)) 
+                                                                                    @foreach ([$user->name] as $option)
+                                                                                        <option value="{{ $option }}" class="!text-xs"
+                                                                                            {{ $value == $option ? 'selected' : $value }}>
+                                                                                            {{ $option }}
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                @else
+                                                                                    @foreach ([$value, $user->name] as $option)
+                                                                                        <option value="{{ $option }}" class="!text-xs"
+                                                                                            {{ $value == $option ? 'selected' : $value }}>
+                                                                                            {{ $option }}
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                @endif
+                                                                            @else
+                                                                                @foreach (explode(',', $fieldss["options_{$prim}"]) as $option)
+                                                                                    <option value="{{ $option }}" class="!text-xs"
+                                                                                        {{ $value == $option ? 'selected' : '' }}>
+                                                                                        {{ $option }}</option>
+                                                                                @endforeach
+                                                                            @endif
                                                                         @endif
                                                                     </select>
                                                                 @elseif($valuee === 'date')
-                                                                    <input type="datetime-local"
-                                                                    id="editable-date-{{ $rowIndex }}-{{ $colIndex }}"
-                                                                    class="text-xs block w-full bg-white border border-gray-400 hover:border-gray-500 px-2 py-2 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-                                                                    value="{{ $value }}"
-                                                                    onchange="saveDateChanges({{ $rowIndex }}, '{{ $colIndex }}')"
-                                                                    onblur="saveDateChanges({{ $rowIndex }}, '{{ $colIndex }}')"
-                                                                    onkeydown="handleKeyDown(event, {{ $rowIndex }}, '{{ $colIndex }}')" />
-
-                                                                @elseif($key == 'field_type_1' || $key == 'field_type_3')
                                                                     <div class="editable p-0">
                                                                         {{ $value == null ? '-' : $value }}
                                                                     </div>
-                                                                @else
+                                                                @elseif($valuee == 'textarea')
                                                                     <div id="editable-text-{{ $rowIndex }}-{{ $colIndex }}"
-                                                                        class="editable p-0"
+                                                                        class="editable p-0 min-w-32 max-w-42 text-wrap"
                                                                         onclick="makeEditable({{ $rowIndex }}, '{{ $colIndex }}')">
                                                                         {{ $value == null ? '-' : $value }}
                                                                     </div>
 
-
-                                                                    <input class="text-xs px-2 py-1"
+                                                                    <textarea class="text-xs px-2 py-1 max-w-[250px] h-32 resize-none"
                                                                         id="editable-input-{{ $rowIndex }}-{{ $colIndex }}"
-                                                                        type="text" style="display:none;"
-                                                                        value="{{ $value }}"
+                                                                        style="display:none;"
                                                                         onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')"
-                                                                        onkeydown="handleKeyDown(event, {{ $rowIndex }}, '{{ $colIndex }}')" />
+                                                                        onkeydown="handleKeyDown(event, {{ $rowIndex }}, '{{ $colIndex }})">
+                                                                        {{ $value }}
+                                                                    </textarea>
+                                                                @else
+                                                                    <div class="editable p-0">
+                                                                        {{ $value == null ? '-' : $value }}
+                                                                    </div>
                                                                 @endif
                                                             @endif
                                                         @endif
@@ -661,8 +681,8 @@
                                             @endif
                                         </td>
                                         @endforeach
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs"><a class="bg-gray-300 rounded py-2 px-2" target="_blank" href="{{$entry_link}}">エントリー登録</a></td>
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs"><a class="bg-gray-300 rounded py-2 px-2" target="_blank" href="{{$nl_link}}">NextLink登録</a></td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs"><a class="bg-gray-300 rounded py-1 px-2" target="_blank" href="{{$entry_link}}">エントリー登録</a></td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs"><a class="bg-gray-300 rounded py-1 px-2" target="_blank" href="{{$nl_link}}">NextLink登録</a></td>
                                     </tr>
                                     @endforeach
                             </tbody>

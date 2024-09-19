@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Artisan;
 use App\Models\ProductsMst;
 use App\Models\ProductList;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 use function PHPUnit\Framework\isEmpty;
@@ -138,7 +139,7 @@ class ProductController extends Controller
         $nl_link = $productList->nl_link;
         $entry_link = $productList->entry_link;
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','nl_link','entry_link'));
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','nl_link','entry_link','user'));
     }
 
     /**
@@ -258,6 +259,10 @@ class ProductController extends Controller
         // products_msts table マスター登録
         $user = Auth::user();
         $user_id = $user->id;
+        $user_name = $user->name;
+        $users = User::all()->toArray();
+        $names = collect($users)->pluck('name')->implode(',');
+
         $validatedData = $request->validate([
             'product_name' => 'required|string|max:255',
             'table_name' => 'nullable|string|max:255',
@@ -279,34 +284,38 @@ class ProductController extends Controller
         $add_field = [
             0 => null,
             'product_id' => $product_mst->id,
-            "field_name_1"=>"count",
-            "field_value_1"=>"架電数",
-            "field_type_1"=>"text",
-            "options_1"=>null,
-            "field_name_2"=>"tel_status",
-            "field_value_2"=>"テレマステータス",
+            "field_name_1"=>"tel_status",
+            "field_value_1"=>"テレマステータス",
+            "field_type_1"=>"select",
+            "options_1"=>"不在,NG,再架電,架電禁止,獲得",
+            "field_name_2"=>"agent",
+            "field_value_2"=>"テレマ担当",
             "field_type_2"=>"select",
-            "options_2"=>"不在,キャンセル,通過",
-            "field_name_3"=>"agent",
-            "field_value_3"=>"テレマ担当",
+            "options_2"=>$names,
+            "field_name_3"=>"last_called_agent",
+            "field_value_3"=>"最終架電",
             "field_type_3"=>"text",
             "options_3"=>null,
-            "field_name_4"=>"call_last_date",
-            "field_value_4"=>"最終架電日時",
-            "field_type_4"=>"date",
+            "field_name_4"=>"count",
+            "field_value_4"=>"架電数",
+            "field_type_4"=>"text",
             "options_4"=>null,
-            "field_name_5"=>"call_memo",
-            "field_value_5"=>"メモ",
-            "field_type_5"=>"text",
+            "field_name_5"=>"call_last_date",
+            "field_value_5"=>"最終架電日時",
+            "field_type_5"=>"date",
             "options_5"=>null,
-            "field_name_6"=>"et_done",
-            "field_value_6"=>"エントリー状況",
-            "field_type_6"=>"select",
-            "options_6"=>"未,済",
-            "field_name_7"=>"nl_et_done",
-            "field_value_7"=>"NextLink登録状況",
+            "field_name_6"=>"call_memo",
+            "field_value_6"=>"メモ",
+            "field_type_6"=>"textarea",
+            "options_6"=>null,
+            "field_name_7"=>"et_done",
+            "field_value_7"=>"ET登録状況",
             "field_type_7"=>"select",
             "options_7"=>"未,済",
+            "field_name_8"=>"nl_et_done",
+            "field_value_8"=>"NextLink登録状況",
+            "field_type_8"=>"select",
+            "options_8"=>"未,済",
         ];
         $this->addField($add_field);
 
@@ -837,7 +846,7 @@ class ProductController extends Controller
         $nl_link = $productList->nl_link;
         $entry_link = $productList->entry_link;
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','nl_link','entry_link'));
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','nl_link','entry_link','user'));
         }
 
 

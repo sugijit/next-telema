@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <img src="{{URL::asset('/images/telemonsta3.png')}}" alt="NL TELEMONSTA" class="block h-10 w-auto fill-current text-gray-800">
+                        <img src="{{URL::asset('/images/header-logo2.png')}}" alt="NL TELEMONSTA" class="block h-10 w-auto fill-current text-gray-800">
                     </a>
                 </div>
 
