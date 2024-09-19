@@ -9,7 +9,7 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $table = ''; // デフォルトのテーブル名
+    protected $table = ''; 
 
     public function __construct(array $attributes = [])
     {

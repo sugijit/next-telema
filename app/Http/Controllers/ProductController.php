@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\ProductsMst;
+use App\Models\ProductList;
 use App\Models\Product;
 use Illuminate\Support\Facades\Auth;
 
@@ -28,10 +29,13 @@ class ProductController extends Controller
         $company_id = $user->company_id;
         $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
         $first_product = ProductsMst::where('company_id', $company_id)->first();
+        $lists = ProductList::all();
+
+        
 
         // リストない場合、addをみせる
         if (empty($products)) {
-            return view('product.add', compact('products'));
+            return view('product.add', compact('products','lists'));
         } else {
             return redirect()->route('products.show', $first_product->id);
         }
@@ -48,7 +52,8 @@ class ProductController extends Controller
         $user = Auth::user();
         $company_id = $user->company_id;
         $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
-        return view('product.add', compact('products'));
+        $lists = ProductList::all();
+        return view('product.add', compact('products','lists'));
     }
 
     /**
@@ -112,6 +117,7 @@ class ProductController extends Controller
         }
 
         $fields = json_decode($product_table->custom_fields, TRUE);
+        // dd($fields);
         $fields = $fields ? $fields : [];
         // dd(session('products', []));
 
@@ -127,8 +133,12 @@ class ProductController extends Controller
         });
         // dd($selectFields);
 
+        $productList = ProductList::find($product_table->product_list_id);
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields'));
+        $nl_link = $productList->nl_link;
+        $entry_link = $productList->entry_link;
+
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','nl_link','entry_link'));
     }
 
     /**
@@ -157,6 +167,9 @@ class ProductController extends Controller
 
     public function upload(Request $request)
     {
+        $product_list_id = $request->input('list_select');
+        $productListModel = ProductList::find($product_list_id);
+        // dd($productListModel->fields);
 
         $request->validate([
             'csv_file' => 'required|mimes:csv,txt',
@@ -199,7 +212,6 @@ class ProductController extends Controller
         $product_name = $request->input('product_name');
         $uploaded_header_eng = $rows[0];
         $column_names = array_shift($rows);
-        // dd($column_names);
 
         foreach ($column_names as $column_name){
             if (!preg_match('/^(?=.*[a-zA-Z_])[a-zA-Z0-9_]+$/', $column_name)) {
@@ -250,6 +262,9 @@ class ProductController extends Controller
             'product_name' => 'required|string|max:255',
             'table_name' => 'nullable|string|max:255',
         ]);
+
+
+
         $product_mst = new ProductsMst();
         $product_mst->product_name = $validatedData['product_name'];
         $product_mst->table_name = $validatedData['table_name'];
@@ -257,7 +272,43 @@ class ProductController extends Controller
         $product_mst->created_user_id = $user_id;
         $product_mst->view = $product_mst_view;
         $product_mst->header = $full_header_eng_jp_arr;
+        $product_mst->product_list_id = $product_list_id;
+        $product_mst->custom_fields = $productListModel->fields;
         $product_mst->save();
+
+        $add_field = [
+            0 => null,
+            'product_id' => $product_mst->id,
+            "field_name_1"=>"count",
+            "field_value_1"=>"架電数",
+            "field_type_1"=>"text",
+            "options_1"=>null,
+            "field_name_2"=>"tel_status",
+            "field_value_2"=>"テレマステータス",
+            "field_type_2"=>"select",
+            "options_2"=>"不在,キャンセル,通過",
+            "field_name_3"=>"agent",
+            "field_value_3"=>"テレマ担当",
+            "field_type_3"=>"text",
+            "options_3"=>null,
+            "field_name_4"=>"call_last_date",
+            "field_value_4"=>"最終架電日時",
+            "field_type_4"=>"date",
+            "options_4"=>null,
+            "field_name_5"=>"call_memo",
+            "field_value_5"=>"メモ",
+            "field_type_5"=>"text",
+            "options_5"=>null,
+            "field_name_6"=>"et_done",
+            "field_value_6"=>"エントリー状況",
+            "field_type_6"=>"select",
+            "options_6"=>"未,済",
+            "field_name_7"=>"nl_et_done",
+            "field_value_7"=>"NextLink登録状況",
+            "field_type_7"=>"select",
+            "options_7"=>"未,済",
+        ];
+        $this->addField($add_field);
 
 
         // CSVデータ挿入
@@ -363,14 +414,14 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'message' => 'Product table not found'], 404);
             }
 
-            $modelClass = new Product();
-            $modelClass->setTableName('product_'.$product_table['table_name'] . '1s')->get();
+            $productModel = new Product();
+            $productModel->setTableName('product_'.$product_table['table_name'] . '1s')->get();
+            $products = $productModel->get(); 
 
-            if (!class_exists($modelClass)) {
-                return response()->json(['success' => false, 'message' => 'Model class not found'], 404);
-            }
+            // if (!class_exists($products)) {
+            //     return response()->json(['success' => false, 'message' => 'Model class not found'], 404);
+            // }
 
-            $products = $modelClass::all();
 
             if ($rowIndex >= count($products)) {
                 return response()->json(['success' => false, 'message' => 'Row index out of range'], 400);
@@ -382,7 +433,7 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'message' => 'Column index not found'], 400);
             }
 
-            $product[$colIndex] = $value;
+            $product->{$colIndex} = $value;
             $product->save();
 
             return response()->json(['success' => true]);
@@ -404,10 +455,11 @@ class ProductController extends Controller
         return redirect()->route('products.show', $product->id);
     }
 
-    public function addField(Request $request)
+    public function addField($add_field)
     {
-        $product_id = $request->input('product_id');
-        $posted_data = array_slice($request->input(), 2);
+        
+        $product_id = $add_field['product_id'];
+        $posted_data = array_slice($add_field, 2);
         // dd($posted_data);
         $product = ProductsMst::find($product_id);
         $table_name = "product_" . $product->table_name . '1s';
@@ -719,10 +771,10 @@ class ProductController extends Controller
     
             // Apply date filters
             if ($request->filled('date_from')) {
-                $query->where('updated_at', '>=', $request->input('date_from'));
+                $query->where('telema_call_last_date', '>=', $request->input('date_from'));
             }
             if ($request->filled('date_to')) {
-                $query->where('updated_at', '<', $request->input('date_to') . ' 23:59:59');
+                $query->where('telema_call_last_date', '<', $request->input('date_to') . ' 23:59:59');
             }
     
             // Apply select field filters
@@ -780,7 +832,12 @@ class ProductController extends Controller
 
         $id = $request->input('product_id');
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields'));
+        $productList = ProductList::find($product_table->product_list_id);
+
+        $nl_link = $productList->nl_link;
+        $entry_link = $productList->entry_link;
+
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','nl_link','entry_link'));
         }
 
 

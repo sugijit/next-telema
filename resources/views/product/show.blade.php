@@ -504,16 +504,16 @@
 
                 <div class="p-6 !pt-0 bg-white border-b border-gray-200">
                     <div class="mb-4 flex justify-end gap-3">
-                        <button onclick="downloadCSV()" ><i class="text-sm fa-solid fa-download text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded">　ダウンロード</i></button>
+                        {{-- <button onclick="downloadCSV()" ><i class="text-sm fa-solid fa-download text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded">　ダウンロード</i></button> --}}
 
                         <button onclick="openFilterModal()"><i class="text-sm fa-solid fa-filter text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　絞り込み</i></button>
                         <button id="settings_button" onclick="openModal()"><i
                                 class="text-sm fa-solid fa-eye text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示設定</i></button>
-                        <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
+                        {{-- <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
                             class="text-white bg-blue-500 hover:bg-blue-700 rounded text-sm px-4 py-2 text-center inline-flex items-center"
                             type="button"><strong>フィールド設定　 </strong><i
                                 class="ml-2 fa-solid fa-circle-chevron-down"></i>
-                        </button>
+                        </button> --}}
                         <div id="dropdown"
                             class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
@@ -550,6 +550,8 @@
                                                 ondblclick="resizeTable()">{{ $head }}</th>
                                         @endif
                                     @endforeach
+                                    <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase">ET</th>
+                                    <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase">NEXTLINK</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -580,7 +582,6 @@
                                                     @endif
                                                 </div>
                                             @endif
-
                                             @php
                                                 if (Str::startsWith($colIndex, 'telema')) {
                                                     $fieldKey = str_replace('telema_', '', $colIndex);
@@ -608,6 +609,7 @@
 
                                                     @foreach ($fieldTypes as $key => $valuee)
                                                         @if ($fieldKey === reset($fieldss))
+                                                        {{-- <?php print_r($key) ?> --}}
                                                             @if (array_key_exists($key, $fieldss))
                                                                 @if ($valuee === 'select')
                                                                     <select
@@ -625,7 +627,7 @@
                                                                         @endif
                                                                     </select>
                                                                 @elseif($valuee === 'date')
-                                                                    <input type="date"
+                                                                    <input type="datetime-local"
                                                                     id="editable-date-{{ $rowIndex }}-{{ $colIndex }}"
                                                                     class="text-xs block w-full bg-white border border-gray-400 hover:border-gray-500 px-2 py-2 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
                                                                     value="{{ $value }}"
@@ -633,6 +635,10 @@
                                                                     onblur="saveDateChanges({{ $rowIndex }}, '{{ $colIndex }}')"
                                                                     onkeydown="handleKeyDown(event, {{ $rowIndex }}, '{{ $colIndex }}')" />
 
+                                                                @elseif($key == 'field_type_1' || $key == 'field_type_3')
+                                                                    <div class="editable p-0">
+                                                                        {{ $value == null ? '-' : $value }}
+                                                                    </div>
                                                                 @else
                                                                     <div id="editable-text-{{ $rowIndex }}-{{ $colIndex }}"
                                                                         class="editable p-0"
@@ -653,11 +659,12 @@
                                                     @endforeach
                                                 @endforeach
                                             @endif
-
-                                            </td>
+                                        </td>
                                         @endforeach
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs"><a class="bg-gray-300 rounded py-2 px-2" target="_blank" href="{{$entry_link}}">エントリー登録</a></td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs"><a class="bg-gray-300 rounded py-2 px-2" target="_blank" href="{{$nl_link}}">NextLink登録</a></td>
                                     </tr>
-                                @endforeach
+                                    @endforeach
                             </tbody>
                         </table>
                     </div>
