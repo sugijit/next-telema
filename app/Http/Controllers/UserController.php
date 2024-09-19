@@ -30,7 +30,14 @@ class UserController extends Controller
 
     public function create()
     {
-        $companies = Company::all();
+        $user = Auth::user();
+        $company_id = $user->company_id;
+
+        if ($user->role == 'nl_admin') {
+            $companies = Company::all();
+        } else {
+            $companies = Company::where('id',$company_id)->get();
+        }
         return view('users.create', compact('companies'));
     }
 
@@ -52,7 +59,7 @@ class UserController extends Controller
             'company_id' => $request->company_id,
         ]);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+        return redirect()->route('users.index')->with('success', 'ユーザーを追加出来ました。');
     }
 
     public function edit(User $user)
@@ -93,6 +100,6 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('users.index')->with('success', 'ユーザーが削除されました。');
     }
 }
