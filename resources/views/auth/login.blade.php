@@ -7,9 +7,9 @@
 
         <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <div class="flex"><x-input-label for="user_cd"  :value="__('ログインID')"/><div class="text-[0.7rem] pt-[0.8px] pb-0 mb-0">（nextlinkのログインコードと同様）</div></div>
+            <x-text-input id="user_cd" class="block mt-1 w-full" type="text" name="user_cd" :value="old('user_cd')" required autofocus autocomplete="username" />
+            <x-input-error :messages="$errors->get('user_cd')" class="mt-2" />
         </div>
 
         <!-- Password -->

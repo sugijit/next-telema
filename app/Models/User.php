@@ -23,6 +23,8 @@ class User extends Authenticatable
         'password',
         'role',
         'company_id',
+        'pass_decrypt',
+        'user_cd',
     ];
 
     /**
