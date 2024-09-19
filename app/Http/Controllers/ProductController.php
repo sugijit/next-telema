@@ -317,7 +317,7 @@ class ProductController extends Controller
             "field_type_8"=>"select",
             "options_8"=>"未,済",
         ];
-        $this->addField($add_field);
+        $this->firstFields($add_field);
 
 
         // CSVデータ挿入
@@ -464,21 +464,17 @@ class ProductController extends Controller
         return redirect()->route('products.show', $product->id);
     }
 
-    public function addField($add_field)
+    public function firstFields($add_field)
     {
         
         $product_id = $add_field['product_id'];
         $posted_data = array_slice($add_field, 2);
-        // dd($posted_data);
         $product = ProductsMst::find($product_id);
         $table_name = "product_" . $product->table_name . '1s';
 
 
         $posted_data_in_array = array_chunk($posted_data, 4, true);
 
-
-
-        // dd($posted_data_in_array);
         $old_mst_fields = json_decode($product->custom_fields, TRUE);
         if ($old_mst_fields != null) {
             $posted_data_in_array = array_filter($posted_data_in_array, function ($item) use ($old_mst_fields) {
@@ -517,15 +513,6 @@ class ProductController extends Controller
             }
         }
 
-
-
-        // dd($field_names);
-
-
-
-        // $this->headerAndViewUpdate($product_id, $posted_data_in_array);
-
-
         try {
             DB::beginTransaction();
             if (Schema::hasTable($table_name)) {
@@ -547,18 +534,6 @@ class ProductController extends Controller
             DB::rollBack();
             return back()->with('error', 'クエリエラーが発生しました: ' . $e->getMessage());
         }
-
-        // モデルに追記 $fillable
-        // $full_field_names = Schema::getColumnListing($table_name);
-        // $elementsToRemove = ['id', 'created_at', 'updated_at'];
-        // $full_field_names = array_diff($full_field_names, $elementsToRemove);
-        // $model_name = "Product" . ucfirst($product->table_name);
-        // $modelClass = 'App\\Models\\' . $model_name . '1';
-
-        // $modelClass = new Product();
-        // $modelClass->setTableName('product_'.ucfirst($product->table_name) . '1s')->get();
-        // $model = app($modelClass);
-        // $model->updateFillable($full_field_names);
 
         // ProductsMstsにフォーム情報を追加
         $posted_data_in_array = array_chunk($posted_data, 4, true);
@@ -956,4 +931,5 @@ class ProductController extends Controller
 
             return response()->json(['success' => true]);
         }
+
 }

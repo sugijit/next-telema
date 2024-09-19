@@ -209,67 +209,6 @@
         </div>
     </div>
 
-    {{-- フィールドモーダル --}}
-    <div id="settingsFieldModalAdd"
-        class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]"
-        onclick="closeFieldModalAdd(event)">
-        <div class="bg-white min-w-[500px] max-h-[80%] overflow-y-scroll p-6 rounded-xl shadow-lg relative"
-            onclick="event.stopPropagation()">
-            <button onclick="closeFieldModalAdd()"
-                class="text-xl absolute top-3 right-6 text-gray-500 hover:text-gray-700">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <h2 class="text-sm font-bold mt-3 !mb-3 border-b pb-3 text-gray-600">
-                {{ $current_list['product_name'] }}のメモ用のフィールド追加</h2>
-            <form id="settingsFieldForm" action="{{ route('product.addField') }}" method="POST">
-                @csrf
-                <input type="text" value={{ $id }} class="hidden" name="product_id">
-                <div>
-                    <button type="button" onclick="addField()"><i
-                            class="fa-solid mb-4 fa-circle-plus text-xl text-green-500"></i></button>
-                    <div id="field-container1">
-                        @php $currentFieldIndex = 1; @endphp
-                        @foreach ($fields as $field)
-                            @foreach ($field as $key => $value)
-                                @if (strpos($key, 'field_type') !== false)
-                                    <div class="flex align-center gap-3 mb-2 opacity-20"
-                                        id="field-{{ $currentFieldIndex }}">
-                                        <p class="pt-1">{{ $currentFieldIndex }}</p>
-                                        <input class="text-xs rounded-md placeholder:text-[0.6rem]" type="text"
-                                            name="field_name_{{ $currentFieldIndex }}" placeholder="(英字) 例：result"
-                                            value="{{ $field['field_name_' . $currentFieldIndex] }}" readonly>
-                                        <input class="text-xs rounded-md" type="text"
-                                            name="field_value_{{ $currentFieldIndex }}" placeholder="例：結果"
-                                            value="{{ $field['field_value_' . $currentFieldIndex] }}" readonly>
-                                        <select class="text-xs rounded-md" name="field_type_{{ $currentFieldIndex }}"
-                                            onchange="toggleOptions({{ $currentFieldIndex }}, this)" readonly
-                                            style="pointer-events: none;">
-                                            <option value="text" {{ $value === 'text' ? 'selected' : '' }}>テキスト式
-                                            </option readonly>
-                                            <option value="select" {{ $value === 'select' ? 'selected' : '' }}>選択式
-                                            </option readonly>
-                                        </select>
-                                        <div id="options-container1-{{ $currentFieldIndex }}"
-                                            class="{{ $value === 'select' ? '' : 'hidden' }}">
-                                            <input class="text-xs rounded-md" type="text"
-                                                name="options_{{ $currentFieldIndex }}" placeholder="選択肢 (カンマで区切る)"
-                                                value="{{ $field['options_' . $currentFieldIndex] }}" readonly>
-                                        </div>
-                                    </div>
-                                    @php $currentFieldIndex++; @endphp
-                                @endif
-                            @endforeach
-                        @endforeach
-                    </div>
-                </div>
-                <div class="text-center text-sm mt-8">
-                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">保存</button>
-                    <button type="button" onclick="closeFieldModalAdd()"
-                        class="ml-2 bg-gray-300 py-2 px-4 rounded">キャンセル</button>
-                </div>
-            </form>
-        </div>
-    </div>
     
     {{-- フィールドモーダル 変更 --}}
     <div id="settingsFieldModalUpdate"
@@ -305,6 +244,8 @@
                                         <option value="select" {{ $value === 'select' ? 'selected' : '' }}>選択式
                                         </option>
                                         <option value="date" {{ $value === 'date' ? 'selected' : '' }}>日付
+                                        </option>
+                                        <option value="textarea" {{ $value === 'textarea' ? 'selected' : '' }}>テキストボックス
                                         </option>
                                     </select>
                                     <div id="options-container-{{ $currentFieldIndex }}"
@@ -509,19 +450,15 @@
                         <button onclick="openFilterModal()"><i class="text-sm fa-solid fa-filter text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　絞り込み</i></button>
                         <button id="settings_button" onclick="openModal()"><i
                                 class="text-sm fa-solid fa-eye text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示設定</i></button>
-                        {{-- <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
+                        <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
                             class="text-white bg-blue-500 hover:bg-blue-700 rounded text-sm px-4 py-2 text-center inline-flex items-center"
                             type="button"><strong>フィールド設定　 </strong><i
                                 class="ml-2 fa-solid fa-circle-chevron-down"></i>
-                        </button> --}}
+                        </button>
                         <div id="dropdown"
                             class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                             <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
                                 aria-labelledby="dropdownDefaultButton">
-                                <li>
-                                    <a id="field_add" href="#" onclick="openFieldModalAdd()"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">追加</a>
-                                </li>
                                 <li>
                                     <a id="field_update" href="#" onclick="openFieldModalUpdate()"
                                         class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">変更</a>
