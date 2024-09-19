@@ -469,9 +469,11 @@
                                 </li>
                             </ul>
                         </div>
+                        @if($user->role == 'nl_admin')
                         <button id="delete_button" onclick="confirmDelete()">
                             <i class="text-sm fa-solid fa-trash text-white bg-red-500 hover:bg-red-700 py-2 px-4 rounded">　削除</i>
                         </button>
+                        @endif
                     </div>
 
                     <div class="overflow-scroll !h-[650px]">
