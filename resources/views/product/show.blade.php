@@ -477,7 +477,11 @@
                     </div>
 
                     <div class="overflow-scroll !h-[650px]">
-                        <table class="min-w-full divide-y divide-gray-200 ">
+                        @if($user->company_id == "1")
+                            <table class="min-w-full divide-y divide-gray-200">
+                        @else
+                            <table class="min-w-full divide-y divide-gray-200 select-none">
+                        @endif
                             <thead class="bg-blue-100 sticky top-0">
                                 <tr>
                                     @foreach ($header as $head)

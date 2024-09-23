@@ -21,9 +21,9 @@ class UserController extends Controller
         // $users = User::all();
         $user = Auth::user();
         $company_id = $user->company_id;
-        $users = User::where('company_id', $company_id)->get();
+        $users = User::where('company_id', $company_id)->orderBy('company_id')->get();
         if($user->role == 'nl_admin') {
-            $users = User::all();
+            $users = User::orderBy('company_id')->get();
         }
         return view('users.index', compact('users'));
     }
