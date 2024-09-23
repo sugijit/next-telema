@@ -174,5 +174,29 @@ class initUsersSeeder extends Seeder
                 'updated_at' => now(),
             ],
         ]);
+
+        DB::table('companies')->insert([
+            [
+                'name' => "株式会社NextLink",
+                'manager_name' => "増井美樹",
+                'manager_phone' => "0120-983-777",
+                'manager_mail' => "m.masui@nl-nextlink.com",
+                'address' => "〒541-0053 大阪府大阪市中央区本町4丁目4－17RE-012ビル6階",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        DB::table('product_lists')->insert([
+            [
+                'list_name' => "エブリィフレシャス",
+                'list_alias' => "everyfrecious",
+                'company_id' => "0120-983-777",
+                'nl_link' => "https://stg.nextlink-portal.com/agent/product/015/regist",
+                'entry_link' => "https://www.frecious.jp/regi/index.php",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
     }
 }
