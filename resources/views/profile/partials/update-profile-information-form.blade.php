@@ -23,7 +23,7 @@
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
         <div>
-            <x-input-label for="user_cd" :value="__('ID')" />
+            <x-input-label for="user_cd" :value="__('ログインID')" />
             <x-text-input id="user_cd" name="user_cd" type="text" class="mt-1 block w-full" :value="old('user_cd', $user->user_cd)" required autofocus autocomplete="user_cd" />
             <x-input-error class="mt-2" :messages="$errors->get('user_cd')" />
         </div>

@@ -12,6 +12,10 @@
             background-color: #f63b57;
             border-color: #f63b57;
         }
+        .highlighted {
+            background-color: rgb(122, 203, 231) !important;
+            font-weight: bold !important;
+        }
 
         /* SWITCH */
             .switch {
@@ -499,7 +503,13 @@
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 static">
                                 @foreach ($list_items as $rowIndex => $list_item)
-                                    <tr class="odd:bg-white even:bg-gray-50">
+                                    @if(($list_item['telema_et_done'] == '済') && ($list_item['telema_et_done']) && ($list_item['telema_tel_status'] == '獲得'))
+                                        <tr id="record_row" class="bg-green-50 text-gray-400">
+                                    @elseif ($list_item['telema_tel_status'] == '架電禁止')
+                                        <tr id="record_row" class="bg-red-50 text-gray-400">
+                                    @else
+                                        <tr id="record_row" class="odd:bg-white even:bg-gray-50">
+                                    @endif
                                         @foreach ($list_item as $colIndex => $value)
                                             @if (Str::startsWith($colIndex, 'telema'))
                                                 <td class="px-3 py-0 whitespace-nowrap bg-green-50 text-xs h-2">
@@ -838,6 +848,9 @@
             const id = "{{ $id }}";
             const user_name = "{{ $user->name }}";
             const phone_ahref = document.getElementById(`editable-phone-${rowIndex }-${colIndex }`);
+            highlightThis(phone_ahref);
+
+            console.log(thisTr)
             console.log(user_name)
             console.log(phone_ahref)
             const phone_number = phone_ahref.textContent;
@@ -870,6 +883,17 @@
                     console.error('Error:', error);
                     alert('エラーが発生しました');
                 });
+        }
+    </script>
+
+    {{-- highlight --}}
+    <script>
+        function highlightThis(phone_ahref = null) {
+            const thisTr = phone_ahref.closest('tr');
+            document.querySelectorAll('tr').forEach(function(tr) {
+                tr.classList.remove('highlighted');
+            });
+            thisTr.classList.add('highlighted');
         }
     </script>
 
