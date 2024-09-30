@@ -17,6 +17,9 @@ function openFieldModalDelete() {
 function openFieldModalUpdate() {
     document.getElementById('settingsFieldModalUpdate').classList.remove('hidden');
 }
+function openCompanyModal() {
+    document.getElementById('settingsCompany').classList.remove('hidden');
+}
 
 function closeModal(event) {
     if (event) {
@@ -42,6 +45,12 @@ function closeFieldModalUpdate(event) {
         event.stopPropagation();
     }
     document.getElementById('settingsFieldModalUpdate').classList.add('hidden');
+}
+function closeCompanyModal(event) {
+    if (event) {
+        event.stopPropagation();
+    }
+    document.getElementById('settingsCompany').classList.add('hidden');
 }
 
 

@@ -53,6 +53,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth','nl_admin'])->group(function () {
     Route::resource('companies', CompanyController::class);
+    Route::post('/products/update-companies', [ProductController::class, 'update_companies'])->name('product.updateCompanies');
 });
 
 Route::middleware(['auth','admin'])->group(function () {

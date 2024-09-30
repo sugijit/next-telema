@@ -366,6 +366,54 @@
 
 
 
+    {{-- 表示会社 変更 --}}
+    <div id="settingsCompany"
+    class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]"
+    onclick="closeCompanyModal(event)">
+    <div class="bg-white min-w-[500px] max-h-[80%] overflow-y-scroll p-6 rounded-xl shadow-lg relative"
+        onclick="event.stopPropagation()">
+        <button onclick="closeCompanyModal()"
+            class="text-xl absolute top-3 right-6 text-gray-500 hover:text-gray-700">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h2 class="text-sm font-bold mt-3 !mb-3 border-b pb-3 text-gray-600">フィールド変更</h2>
+        <form id="settingsFieldForm" action="{{ route('product.updateCompanies') }}" method="POST">
+            @csrf
+            <input type="text" value={{ $id }} class="hidden" name="product_id">
+            
+
+            <div class="flex flex-wrap -mx-2">
+                @foreach($companiess as $key => $company)
+                        <div class="w-1/2 px-2 mb-4 flex items-center">
+                            @if($user->company_id == $company->id) 
+                                <input type="checkbox" id="company{{ $key }}" name="companies[]" value="{{ $company->id }}" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" disabled checked>
+                                <input type="checkbox" id="company{{ $key }}" name="companies[]" value="{{ $company->id }}" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 hidden" checked>
+                            @elseif(in_array($company->id, $company_ids))
+                                <input type="checkbox" id="company{{ $key }}" name="companies[]" value="{{ $company->id }}" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" checked>
+                            @else
+                                <input type="checkbox" id="company{{ $key }}" name="companies[]" value="{{ $company->id }}" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            @endif
+                            <label for="company{{ $key }}" class="ml-2 text-gray-600">{{ $company->name }}</label>
+                        </div>
+                @endforeach
+            </div>
+
+            @if (!empty($fields))
+                <div class="text-center text-sm mt-8">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">保存</button>
+                    <button type="button" onclick="closeCompanyModal()"
+                        class="ml-2 bg-gray-300 py-2 px-4 rounded">キャンセル</button>
+                </div>
+            @else
+                <p class="text-center text-gray-400">フィールドありません</p>
+            @endif
+        </form>
+    </div>
+    </div>
+
+
+
+
     {{-- フィールドモーダル  DELETE --}}
     <div id="settingsFieldModalDelete"
         class="hidden p-6 fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-[600000]"
@@ -474,6 +522,9 @@
                             </ul>
                         </div>
                         @if($user->role == 'nl_admin')
+                        <button id="company_setting_button" onclick="openCompanyModal()">
+                            <i class="text-sm fa-solid fa-key text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示企業設定</i>
+                        </button>
                         <button id="delete_button" onclick="confirmDelete()">
                             <i class="text-sm fa-solid fa-trash text-white bg-red-500 hover:bg-red-700 py-2 px-4 rounded">　削除</i>
                         </button>

@@ -169,6 +169,7 @@ class ProductController extends Controller
         // dd($selectFields);
 
         $productList = ProductList::find($product_table->product_list_id);
+        $productMst = [];
 
         $selectUsers = [];
         if ($user->role == "nl_admin") {
@@ -186,8 +187,11 @@ class ProductController extends Controller
         }
 
         $companies = Company::all()->toArray();
-        // dd($companies);
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user', 'selectUsers','companies'));
+        $companiess = [];
+        $companiess = Company::select('id', 'name')->get();
+        // dd($companiess);
+        // dd($company_ids);
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user', 'selectUsers','companies', 'companiess', 'company_ids'));
     }
 
     /**
@@ -1019,6 +1023,22 @@ class ProductController extends Controller
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
 
+        }
+
+
+        public function update_companies(Request $request){
+            $product_id = $request->input('product_id');
+            $company_ids = $request->input('companies');
+            $product = ProductsMst::find($product_id);
+
+
+            $companyIds = json_encode($company_ids);
+            $product->company_id = $companyIds;
+            $product->save();
+
+            // showへリダイレクト
+            return redirect()->route('products.show', $product_id)
+            ->with('success', "表示企業を保存しました");
         }
 
 }
