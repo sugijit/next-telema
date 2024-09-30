@@ -59,7 +59,7 @@ class User extends Authenticatable
         $user = Auth::user();
         $my_company_id = $user->company_id;
         $requested_user = self::where('id', $user_id)->first(); // Use first() instead of get()
-        if ($requested_user && $requested_user->company_id == $my_company_id) { // Check if product exists
+        if (($requested_user && $requested_user->company_id == $my_company_id) || $user->role == 'nl_admin') { // Check if product exists
             return true;
         }
         return false; // Simplified return

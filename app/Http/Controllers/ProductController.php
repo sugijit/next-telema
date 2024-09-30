@@ -45,7 +45,11 @@ class ProductController extends Controller
 
         // リストない場合、addをみせる
         if (empty($products)) {
-            return view('product.add', compact('products','lists', 'companies'));
+            if ($user->role == "nl_admin") {
+                return view('product.add', compact('products','lists', 'companies'));
+            } else {
+                return view('product.nolist');
+            }
         } else {
             $first_product = $products[0];
             return redirect()->route('products.show', $first_product['id']);
@@ -62,7 +66,15 @@ class ProductController extends Controller
     {
         $user = Auth::user();
         $company_id = $user->company_id;
-        $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
+        $products_all = ProductsMst::all()->toArray();
+        $products = [];
+
+        foreach($products_all as $product) {
+            $company_ids = json_decode($product['company_id'], true);
+            if(in_array($company_id, $company_ids)){
+                $products[] = $product;
+            }
+        }
         $lists = ProductList::all();
         $companies = Company::select('id', 'name')->get();
         return view('product.add', compact('products','lists','companies'));
@@ -140,10 +152,10 @@ class ProductController extends Controller
         }
 
         $fields = json_decode($product_table->custom_fields, TRUE);
-        // dd($fields);
         $fields = $fields ? $fields : [];
         // dd(session('products', []));
-
+        
+        // dd($fields);
         // $list_items = session('products', []);
         $selectFields = [];
         $selectFields = array_filter($fields, function ($item) {
@@ -158,9 +170,15 @@ class ProductController extends Controller
 
         $productList = ProductList::find($product_table->product_list_id);
 
+        $company_users = [];
+        $company_users = User::where('company_id', $company_id)->get()->toArray();
+        // foreach($company_userss as $cu) {
+        //     $company_users[] = $cu['name'];
+        // }
 
+        // dd($company_users);
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user'));
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user', 'company_users'));
     }
 
     /**
@@ -849,10 +867,10 @@ class ProductController extends Controller
 
         $productList = ProductList::find($product_table->product_list_id);
 
-        $nl_link = $productList->nl_link;
-        $entry_link = $productList->entry_link;
+        // $nl_link = $productList->nl_link;
+        // $entry_link = $productList->entry_link;
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','nl_link','entry_link','user'));
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user'));
         }
 
 
