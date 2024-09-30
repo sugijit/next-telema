@@ -32,8 +32,13 @@ class ProductsMst extends Model
         $user = Auth::user();
         $my_company_id = $user->company_id;
         $product = self::where('id', $product_id)->first(); // Use first() instead of get()
-        if ($product && $product->company_id == $my_company_id) { // Check if product exists
-            return true;
+        if ($product) { // Check if product exists
+            $companies = json_decode($product->company_id, true);
+            // dd($companies);
+            if(in_array($my_company_id, $companies)) {
+                return true;
+            };
+           
         }
         return false; // Simplified return
     }

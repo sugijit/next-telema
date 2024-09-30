@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\ProductsMst;
 use App\Models\ProductList;
+use App\Models\Company;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -28,17 +29,26 @@ class ProductController extends Controller
     {
         $user = Auth::user();
         $company_id = $user->company_id;
-        $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
         $first_product = ProductsMst::where('company_id', $company_id)->first();
         $lists = ProductList::all();
+        $companies = Company::select('id', 'name')->get();
+        $products_all = ProductsMst::all()->toArray();
+        $products = [];
 
-        
+        foreach($products_all as $product) {
+            $company_ids = json_decode($product['company_id'], true);
+            if(in_array($company_id, $company_ids)){
+                $products[] = $product;
+                
+            }
+        }
 
         // リストない場合、addをみせる
         if (empty($products)) {
-            return view('product.add', compact('products','lists'));
+            return view('product.add', compact('products','lists', 'companies'));
         } else {
-            return redirect()->route('products.show', $first_product->id);
+            $first_product = $products[0];
+            return redirect()->route('products.show', $first_product['id']);
         }
     }
 
@@ -54,7 +64,8 @@ class ProductController extends Controller
         $company_id = $user->company_id;
         $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
         $lists = ProductList::all();
-        return view('product.add', compact('products','lists'));
+        $companies = Company::select('id', 'name')->get();
+        return view('product.add', compact('products','lists','companies'));
     }
 
     /**
@@ -88,18 +99,29 @@ class ProductController extends Controller
                 $current_list = $product_table->toArray();
             }
         } else {
-             $user = Auth::user();
+            $user = Auth::user();
             $company_id = $user->company_id;
             $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
+            $companies = Company::select('id', 'name')->get();
             $list_items = [];
             $current_list = [];
-            return view('product.add', compact('products', 'current_list'));
+            return view('product.add', compact('products', 'current_list', 'companies'));
         }
 
 
         $user = Auth::user();
         $company_id = $user->company_id;
-        $products = ProductsMst::where('company_id', $company_id)->get()->toArray();
+        $products_all = ProductsMst::all()->toArray();
+        $products = [];
+
+        foreach($products_all as $product) {
+            $company_ids = json_decode($product['company_id'], true);
+            if(in_array($company_id, $company_ids)){
+                $products[] = $product;
+            }
+        }
+
+        // dd($products);
 
         $can_views = json_decode($current_list["view"], TRUE);
         $view_settings = json_decode($current_list["view"], TRUE);
@@ -136,10 +158,9 @@ class ProductController extends Controller
 
         $productList = ProductList::find($product_table->product_list_id);
 
-        $nl_link = $productList->nl_link;
-        $entry_link = $productList->entry_link;
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','nl_link','entry_link','user'));
+
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user'));
     }
 
     /**
@@ -168,8 +189,11 @@ class ProductController extends Controller
 
     public function upload(Request $request)
     {
+        // dd($request->input());
+
+
         $product_list_id = $request->input('list_select');
-        $productListModel = ProductList::find($product_list_id);
+        // $productListModel = ProductList::find($product_list_id);
         // dd($productListModel->fields);
 
         $request->validate([
@@ -268,17 +292,24 @@ class ProductController extends Controller
             'table_name' => 'nullable|string|max:255',
         ]);
 
+        //company_idに表示できる会社のidを配列で入れる
+        $companyIds = array_map(function($company) {
+            $companyData = json_decode($company, true); // JSONを配列に変換
+            return $companyData['id']; // idだけを返す
+        }, $request->input('companies'));
+        $companyIds = json_encode($companyIds);
+        // dd($companyIds);
 
 
         $product_mst = new ProductsMst();
         $product_mst->product_name = $validatedData['product_name'];
         $product_mst->table_name = $validatedData['table_name'];
-        $product_mst->company_id = $user->company_id;
+        $product_mst->company_id = $companyIds;
         $product_mst->created_user_id = $user_id;
         $product_mst->view = $product_mst_view;
         $product_mst->header = $full_header_eng_jp_arr;
         $product_mst->product_list_id = $product_list_id;
-        $product_mst->custom_fields = $productListModel->fields;
+        $product_mst->custom_fields = null;
         $product_mst->save();
 
         $add_field = [
