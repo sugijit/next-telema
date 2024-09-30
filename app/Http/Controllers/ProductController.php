@@ -308,14 +308,14 @@ class ProductController extends Controller
             "field_value_6"=>"メモ",
             "field_type_6"=>"textarea",
             "options_6"=>null,
-            "field_name_7"=>"et_done",
-            "field_value_7"=>"ET登録状況",
-            "field_type_7"=>"select",
-            "options_7"=>"未,済",
-            "field_name_8"=>"nl_et_done",
-            "field_value_8"=>"NextLink登録状況",
-            "field_type_8"=>"select",
-            "options_8"=>"未,済",
+            // "field_name_7"=>"et_done",
+            // "field_value_7"=>"ET登録状況",
+            // "field_type_7"=>"select",
+            // "options_7"=>"未,済",
+            // "field_name_8"=>"nl_et_done",
+            // "field_value_8"=>"NextLink登録状況",
+            // "field_type_8"=>"select",
+            // "options_8"=>"未,済",
         ];
         $this->firstFields($add_field);
 

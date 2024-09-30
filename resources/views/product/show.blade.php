@@ -497,13 +497,13 @@
                                                 ondblclick="resizeTable()">{{ $head }}</th>
                                         @endif
                                     @endforeach
-                                    <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase">ET</th>
-                                    <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase">NEXTLINK</th>
+                                    {{-- <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase">ET</th>
+                                    <th class="px-3 py-3 !w-full text-left text-xs font-medium text-gray-500 uppercase">NEXTLINK</th> --}}
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200 static">
                                 @foreach ($list_items as $rowIndex => $list_item)
-                                    @if(($list_item['telema_et_done'] == '済') && ($list_item['telema_et_done']) && ($list_item['telema_tel_status'] == '獲得'))
+                                    @if($list_item['telema_tel_status'] == '獲得')
                                         <tr id="record_row" class="bg-green-50 text-gray-400">
                                     @elseif ($list_item['telema_tel_status'] == '架電禁止')
                                         <tr id="record_row" class="bg-red-50 text-gray-400">
@@ -634,8 +634,8 @@
                                             @endif
                                         </td>
                                         @endforeach
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs"><a class="bg-gray-300 rounded py-1 px-2" target="_blank" href="{{$entry_link}}">エントリー登録</a></td>
-                                        <td class="px-3 py-2 whitespace-nowrap text-xs"><a class="bg-gray-300 rounded py-1 px-2" target="_blank" href="{{$nl_link}}">NextLink登録</a></td>
+                                        {{-- <td class="px-3 py-2 whitespace-nowrap text-xs"><a class="bg-gray-300 rounded py-1 px-2" target="_blank" href="{{$entry_link}}">エントリー登録</a></td>
+                                        <td class="px-3 py-2 whitespace-nowrap text-xs"><a class="bg-gray-300 rounded py-1 px-2" target="_blank" href="{{$nl_link}}">NextLink登録</a></td> --}}
                                     </tr>
                                     @endforeach
                             </tbody>
