@@ -487,11 +487,13 @@
                                     class="inline-block p-4 border-b-4 rounded-t-lg {{ $product['id'] == $id ? 'text-blue-600 border-b-blue-600' : 'hover:text-gray-600 hover:border-gray-300' }}">{{ $product['product_name'] }}</a>
                             </li>
                         @endforeach
+                        @if($user->role == 'nl_admin')
                         <li class="">
                             <a href="{{ route('products.add') }}"
                                 class="inline-block p-3 border-b-4 rounded-t-lg text-green-500 text-xl"><i
                                     class="fa-solid fa-circle-plus"></i></a>
                         </li>
+                        @endif
                     </ul>
                 </div>
 

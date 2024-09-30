@@ -32,8 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/companies/{company}', [CompanyController::class, 'destroy'])->name('companies.destroy');
 
     Route::get('/products/{type?}', [ProductController::class, 'index'])->name('products');
-    Route::get('/products.add}', [ProductController::class, 'add'])->name('products.add');
-    Route::post('/products/upload', [ProductController::class, 'upload'])->name('products.upload');
+
+
 
     Route::post('/update-cell', [ProductController::class, 'updateCell'])->name('updateCell');
     Route::post('/called-change', [ProductController::class, 'calledChange'])->name('calledChange');
@@ -48,16 +48,27 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/products/nolist', [ProductController::class, 'index'])->name('product.nolist');
 
-    Route::delete('/products/{id}/delete', [ProductController::class, 'delete'])->name('product.delete');
+
 });
 
 Route::middleware(['auth','nl_admin'])->group(function () {
     Route::resource('companies', CompanyController::class);
     Route::post('/products/update-companies', [ProductController::class, 'update_companies'])->name('product.updateCompanies');
+    Route::get('/products.add}', [ProductController::class, 'add'])->name('products.add');
+    Route::post('/products/upload', [ProductController::class, 'upload'])->name('products.upload');
+    Route::delete('/products/{id}/delete', [ProductController::class, 'delete'])->name('product.delete');
+    Route::get('users/create', [UserController::class, 'create'])->name('users.create');
+    Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::patch('users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
 Route::middleware(['auth','admin'])->group(function () {
-    Route::resource('users', UserController::class);
+    Route::get('users', [UserController::class, 'index'])->name('users.index');
+    Route::post('users', [UserController::class, 'store'])->name('users.store');
+    Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+    Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
+
 });
 
 require __DIR__ . '/auth.php';

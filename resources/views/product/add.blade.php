@@ -28,9 +28,9 @@
                             @csrf
                             <div class="my-8">
                                 <label for="list_select" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">代理店選択</label>
-                                <div class="space-y-4">
+                                <div class="flex flex-wrap -mx-2">
                                     @foreach($companies as $key => $company)
-                                        <div class="flex items-center">
+                                        <div class="w-1/2 px-2 mb-4 flex items-center">
                                             <input type="checkbox" id="company{{ $key }}" name="companies[]" value="{{ $company }}" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                                             <label for="company{{ $key }}" class="ml-2 text-gray-600">{{ $company->name }}</label>
                                         </div>

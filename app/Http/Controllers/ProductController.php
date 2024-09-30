@@ -882,8 +882,13 @@ class ProductController extends Controller
 
         // $nl_link = $productList->nl_link;
         // $entry_link = $productList->entry_link;
+        $companiess = [];
+        $companiess = Company::select('id', 'name')->get();
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user'));
+        $productMst = ProductsMst::find($id)->get('company_id')->toArray();
+        $company_ids = json_decode($productMst[0]["company_id"], true);
+
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user','companiess', 'company_ids'));
         }
 
 

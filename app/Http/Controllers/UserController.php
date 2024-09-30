@@ -25,7 +25,7 @@ class UserController extends Controller
         if($user->role == 'nl_admin') {
             $users = User::orderBy('company_id')->get();
         }
-        return view('users.index', compact('users'));
+        return view('users.index', compact('users','user'));
     }
 
     public function create()
