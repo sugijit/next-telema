@@ -850,9 +850,6 @@
             const phone_ahref = document.getElementById(`editable-phone-${rowIndex }-${colIndex }`);
             highlightThis(phone_ahref);
 
-            console.log(thisTr)
-            console.log(user_name)
-            console.log(phone_ahref)
             const phone_number = phone_ahref.textContent;
 
             console.log(`'utasnii dugaar:' + ${phone_number}`);
