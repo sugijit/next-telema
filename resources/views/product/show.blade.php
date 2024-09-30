@@ -596,25 +596,35 @@
                                                                                     @endforeach
                                                                                 @endif
                                                                             @elseif ($key == 'field_type_2' && $user->role == 'admin')
-                                                                                @foreach ($company_users as $option)
+                                                                                @foreach ($selectUsers as $option)
                                                                                     <option value="{{ $option['name'] }}" class="!text-xs"
                                                                                         {{ $value == $option['name'] ? 'selected' : $value }}>
                                                                                         {{ $option['name'] }}
                                                                                     </option>
                                                                                 @endforeach
-                                                                                @foreach ([$value] as $option)
+                                                                                @if($value)
+                                                                                    @foreach ([$value] as $option)
+                                                                                        <option value="{{ $option }}" class="!text-xs"
+                                                                                            {{ $value == $option ? 'selected' : $value }}>
+                                                                                            {{ $option }}
+                                                                                        </option>
+                                                                                    @endforeach
+                                                                                @endif
+                                                                            @else
+                                                                                @foreach ($selectUsers as $option)
+                                                                                    <option value="{{ $option['name'] }}" class="!text-xs"
+                                                                                        {{ $value == $option['name'] ? 'selected' : '' }}>
+                                                                                        {{ $option['name']}} {{ "(" . $companies[$option['company_id']-1]['name'] . ")"}}
+                                                                                    </option>
+                                                                                @endforeach
+                                                                                @if($value)
+                                                                                    @foreach ([$value] as $option)
                                                                                     <option value="{{ $option }}" class="!text-xs"
                                                                                         {{ $value == $option ? 'selected' : $value }}>
                                                                                         {{ $option }}
                                                                                     </option>
-                                                                                @endforeach
-                                                                            @else
-                                                                                @foreach (explode(',', $fieldss["options_{$prim}"]) as $option)
-                                                                                    <option value="{{ $option }}" class="!text-xs"
-                                                                                        {{ $value == $option ? 'selected' : '' }}>
-                                                                                        {{ $option }}
-                                                                                    </option>
-                                                                                @endforeach
+                                                                                    @endforeach
+                                                                                @endif
                                                                             @endif
                                                                         @endif
                                                                     </select>

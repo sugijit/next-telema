@@ -170,15 +170,24 @@ class ProductController extends Controller
 
         $productList = ProductList::find($product_table->product_list_id);
 
-        $company_users = [];
-        $company_users = User::where('company_id', $company_id)->get()->toArray();
-        // foreach($company_userss as $cu) {
-        //     $company_users[] = $cu['name'];
-        // }
+        $selectUsers = [];
+        if ($user->role == "nl_admin") {
+            $productMst = ProductsMst::find($id)->get('company_id')->toArray();
+            $company_ids = json_decode($productMst[0]["company_id"], true);
+            // dd($company_ids);
+            $selectUsers = User::whereIn('company_id', $company_ids)->get()->toArray(); //nl_admin
+            // dd($selectUsers);
+        } elseif($user->role == "admin") {
+            $selectUsers = User::where('company_id', $company_id)->get()->toArray(); //admin
+            // dd($selectUsers);
+        } else {
+            $selectUsers[] = User::find($user->id)->toArray(); //user
+            // dd($selectUsers);
+        }
 
-        // dd($company_users);
-
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user', 'company_users'));
+        $companies = Company::all()->toArray();
+        // dd($companies);
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user', 'selectUsers','companies'));
     }
 
     /**
