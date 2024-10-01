@@ -319,14 +319,22 @@
                                     @endif
                                 @endforeach
                             </label>
-                            
                             <select name="{{$come}}" class="w-full rounded-md border-gray-300 text-xs shadow-sm mt-1">
                                 <option value="">全て</option>
-                                    @foreach (explode(',', $field["{$key}"]) as $option)
-                                        <option value="{{ $option }}" {{ request($come) == $option ? 'selected' : '' }}>
-                                            {{ $option }}
+                                    @if (in_array('agent',$field))
+                                    @foreach ($selectUsers as $option)
+                                        <option value="{{ $option['name'] }}" class="!text-xs"
+                                            {{ $value == $option['name'] ? 'selected' : '' }}>
+                                            {{ $option['name']}} {{ "(" . $companies[$option['company_id']-1]['name'] . ")"}}
                                         </option>
                                     @endforeach
+                                    @else
+                                        @foreach (explode(',', $field["{$key}"]) as $option)
+                                            <option value="{{ $option }}" {{ request($come) == $option ? 'selected' : '' }}>
+                                                {{ $option }}
+                                            </option>
+                                        @endforeach
+                                    @endif
                             </select>
                         </div>
                         @if (($loop->index + 1) % 3 === 0) <!-- 3列ごとに改行 -->
