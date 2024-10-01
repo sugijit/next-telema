@@ -663,7 +663,7 @@
                                                                                         </option>
                                                                                     @endforeach
                                                                                 @endif
-                                                                            @else
+                                                                            @elseif ($key == 'field_type_2' && $user->role == 'nl_admin')
                                                                                 @foreach ($selectUsers as $option)
                                                                                     <option value="{{ $option['name'] }}" class="!text-xs"
                                                                                         {{ $value == $option['name'] ? 'selected' : '' }}>
@@ -678,6 +678,13 @@
                                                                                     </option>
                                                                                     @endforeach
                                                                                 @endif
+                                                                            @else 
+                                                                                @foreach (explode(',', $fieldss["options_{$prim}"]) as $option)
+                                                                                    <option value="{{ $option }}" class="!text-xs"
+                                                                                        {{ $value == $option ? 'selected' : '' }}>
+                                                                                        {{ $option }}
+                                                                                    </option>
+                                                                                @endforeach
                                                                             @endif
                                                                         @endif
                                                                     </select>
