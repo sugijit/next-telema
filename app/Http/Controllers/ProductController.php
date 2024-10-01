@@ -99,8 +99,6 @@ class ProductController extends Controller
             return view('dashboard');
         }
 
-        // dd($product_table['table_name']);
-
         if ($product_table) {
             if ($product_table['table_name']) {
 
@@ -133,8 +131,6 @@ class ProductController extends Controller
             }
         }
 
-        // dd($products);
-
         $can_views = json_decode($current_list["view"], TRUE);
         $view_settings = json_decode($current_list["view"], TRUE);
         $header = json_decode($current_list["header"], TRUE);
@@ -153,9 +149,7 @@ class ProductController extends Controller
 
         $fields = json_decode($product_table->custom_fields, TRUE);
         $fields = $fields ? $fields : [];
-        // dd(session('products', []));
-        
-        // dd($fields);
+
         // $list_items = session('products', []);
         $selectFields = [];
         $selectFields = array_filter($fields, function ($item) {
@@ -166,7 +160,6 @@ class ProductController extends Controller
             }
             return false;
         });
-        // dd($selectFields);
 
         $productList = ProductList::find($product_table->product_list_id);
         $productMst = [];
@@ -175,15 +168,11 @@ class ProductController extends Controller
         if ($user->role == "nl_admin") {
             $productMst = ProductsMst::find($id)->get('company_id')->toArray();
             $company_ids = json_decode($productMst[0]["company_id"], true);
-            // dd($company_ids);
             $selectUsers = User::whereIn('company_id', $company_ids)->get()->toArray(); //nl_admin
-            // dd($selectUsers);
         } elseif($user->role == "admin") {
             $selectUsers = User::where('company_id', $company_id)->get()->toArray(); //admin
-            // dd($selectUsers);
         } else {
             $selectUsers[] = User::find($user->id)->toArray(); //user
-            // dd($selectUsers);
         }
 
         $companies = Company::all()->toArray();
@@ -205,8 +194,6 @@ class ProductController extends Controller
             $got_count = $productModel->where('telema_tel_status', '獲得')->where('telema_last_called_agent',$user->name)->count();
         }
 
-        // dd($companiess);
-        // dd($company_ids);
         return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user', 'selectUsers','companies', 'companiess', 'company_ids','got_count'));
     }
 
@@ -236,12 +223,7 @@ class ProductController extends Controller
 
     public function upload(Request $request)
     {
-        // dd($request->input());
-
-
         $product_list_id = $request->input('list_select');
-        // $productListModel = ProductList::find($product_list_id);
-        // dd($productListModel->fields);
 
         $request->validate([
             'csv_file' => 'required|mimes:csv,txt',
@@ -345,8 +327,6 @@ class ProductController extends Controller
             return $companyData['id']; // idだけを返す
         }, $request->input('companies'));
         $companyIds = json_encode($companyIds);
-        // dd($companyIds);
-
 
         $product_mst = new ProductsMst();
         $product_mst->product_name = $validatedData['product_name'];
@@ -564,7 +544,7 @@ class ProductController extends Controller
                 }
                 return true;
             });
-            // dd($posted_data_in_array);
+
             $field_names = [];
             $copy = [];
 
@@ -601,7 +581,7 @@ class ProductController extends Controller
                 });
                 $field_names_copy = $field_names;
                 $last_field = array_pop($field_names_copy);
-                // dd($last_field);
+
                 DB::statement("ALTER TABLE {$table_name} MODIFY COLUMN created_at TIMESTAMP NULL AFTER {$last_field}");
                 DB::statement("ALTER TABLE {$table_name} MODIFY COLUMN updated_at TIMESTAMP NULL AFTER created_at");
             } else {
@@ -857,7 +837,6 @@ class ProductController extends Controller
                 }
             }
     
-            // dd($query);
             // Execute the query
             $list_items = $query->from('product_'.$product_table['table_name'] . '1s')->get()->toArray();
             $current_list = $product_table->toArray();
@@ -925,15 +904,11 @@ class ProductController extends Controller
         if ($user->role == "nl_admin") {
             $productMst = ProductsMst::find($id)->get('company_id')->toArray();
             $company_ids = json_decode($productMst[0]["company_id"], true);
-            // dd($company_ids);
             $selectUsers = User::whereIn('company_id', $company_ids)->get()->toArray(); //nl_admin
-            // dd($selectUsers);
         } elseif($user->role == "admin") {
             $selectUsers = User::where('company_id', $company_id)->get()->toArray(); //admin
-            // dd($selectUsers);
         } else {
             $selectUsers[] = User::find($user->id)->toArray(); //user
-            // dd($selectUsers);
         }
 
         $companies = Company::all()->toArray();
