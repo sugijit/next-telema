@@ -711,12 +711,11 @@
                                                                     </div>
 
                                                                     <textarea class="text-xs px-2 py-1 max-w-[250px] h-32 resize-none"
-                                                                        id="editable-input-{{ $rowIndex }}-{{ $colIndex }}"
-                                                                        style="display:none;"
-                                                                        onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')"
-                                                                        onkeydown="handleKeyDown(event, {{ $rowIndex }}, '{{ $colIndex }})">
-                                                                        {{ $value }}
-                                                                    </textarea>
+                                                                    id="editable-input-{{ $rowIndex }}-{{ $colIndex }}"
+                                                                    style="display:none;"
+                                                                    onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')"
+                                                                    onkeydown="handleKeyDown(event, {{ $rowIndex }}, '{{ $colIndex }})">{{ $value }}</textarea>
+                                                          
                                                                 @else
                                                                     <div class="editable p-0">
                                                                         {{ $value == null ? '-' : $value }}
