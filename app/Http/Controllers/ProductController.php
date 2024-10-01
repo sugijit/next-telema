@@ -107,7 +107,7 @@ class ProductController extends Controller
                 $productModel = new Product();
                 $productModel->setTableName('product_'.$product_table['table_name'] . '1s')->get();
                 $list_items = $productModel->get()->toArray(); 
-
+                
                 $current_list = $product_table->toArray();
             }
         } else {
@@ -189,9 +189,25 @@ class ProductController extends Controller
         $companies = Company::all()->toArray();
         $companiess = [];
         $companiess = Company::select('id', 'name')->get();
+
+        if ($user->role == 'nl_admin') {
+            $got_count = $productModel->where('telema_tel_status', '獲得')->count();
+        } elseif ($user->role == 'admin') {
+            $company_ids = User::where('id', $user->id)->pluck('company_id')->toArray();
+            $company_user_names = User::whereIn('company_id', $company_ids)->pluck('name')->toArray();
+            $got_count = $productModel->where('telema_tel_status', '獲得')
+                ->where(function($query) use ($user, $company_user_names) {
+                    $query->where('telema_last_called_agent', $user->name)
+                          ->orWhereIn('telema_last_called_agent', $company_user_names);
+                })
+                ->count();
+        } else {
+            $got_count = $productModel->where('telema_tel_status', '獲得')->where('telema_last_called_agent',$user->name)->count();
+        }
+
         // dd($companiess);
         // dd($company_ids);
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user', 'selectUsers','companies', 'companiess', 'company_ids'));
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user', 'selectUsers','companies', 'companiess', 'company_ids','got_count'));
     }
 
     /**
@@ -888,7 +904,45 @@ class ProductController extends Controller
         $productMst = ProductsMst::find($id)->get('company_id')->toArray();
         $company_ids = json_decode($productMst[0]["company_id"], true);
 
-        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user','companiess', 'company_ids'));
+        if ($user->role == 'nl_admin') {
+            $got_count = $modelClass->where('telema_tel_status', '獲得')->count();
+        } elseif ($user->role == 'admin') {
+            $company_ids = User::where('id', $user->id)->pluck('company_id')->toArray();
+            $company_user_names = User::whereIn('company_id', $company_ids)->pluck('name')->toArray();
+            $got_count = $modelClass->where('telema_tel_status', '獲得')
+                ->where(function($query) use ($user, $company_user_names) {
+                    $query->where('telema_last_called_agent', $user->name)
+                          ->orWhereIn('telema_last_called_agent', $company_user_names);
+                })
+                ->count();
+        } else {
+            $got_count = $modelClass->where('telema_tel_status', '獲得')->where('telema_last_called_agent',$user->name)->count();
+        }
+
+
+
+        $selectUsers = [];
+        if ($user->role == "nl_admin") {
+            $productMst = ProductsMst::find($id)->get('company_id')->toArray();
+            $company_ids = json_decode($productMst[0]["company_id"], true);
+            // dd($company_ids);
+            $selectUsers = User::whereIn('company_id', $company_ids)->get()->toArray(); //nl_admin
+            // dd($selectUsers);
+        } elseif($user->role == "admin") {
+            $selectUsers = User::where('company_id', $company_id)->get()->toArray(); //admin
+            // dd($selectUsers);
+        } else {
+            $selectUsers[] = User::find($user->id)->toArray(); //user
+            // dd($selectUsers);
+        }
+
+        $companies = Company::all()->toArray();
+        $companiess = [];
+        $companiess = Company::select('id', 'name')->get();
+
+
+
+        return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user','companiess', 'company_ids', 'got_count', 'selectUsers','companies','companiess'));
         }
 
 

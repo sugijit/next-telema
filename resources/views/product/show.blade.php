@@ -498,39 +498,42 @@
                 </div>
 
                 <div class="p-6 !pt-0 bg-white border-b border-gray-200">
-                    <div class="mb-4 flex justify-end gap-3">
-                        {{-- <button onclick="downloadCSV()" ><i class="text-sm fa-solid fa-download text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded">　ダウンロード</i></button> --}}
+                    <div class="flex justify-between items-center">
+                        <div>獲得数：{{$got_count}}件</div>
+                        <div class="mb-4 flex justify-end gap-3">
+                            {{-- <button onclick="downloadCSV()" ><i class="text-sm fa-solid fa-download text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded">　ダウンロード</i></button> --}}
 
-                        <button onclick="openFilterModal()"><i class="text-sm fa-solid fa-filter text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　絞り込み</i></button>
-                        <button id="settings_button" onclick="openModal()"><i
-                                class="text-sm fa-solid fa-eye text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示設定</i></button>
-                        {{-- <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
-                            class="text-white bg-blue-500 hover:bg-blue-700 rounded text-sm px-4 py-2 text-center inline-flex items-center"
-                            type="button"><strong>フィールド設定　 </strong><i
-                                class="ml-2 fa-solid fa-circle-chevron-down"></i>
-                        </button> --}}
-                        <div id="dropdown"
-                            class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                            <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
-                                aria-labelledby="dropdownDefaultButton">
-                                <li>
-                                    <a id="field_update" href="#" onclick="openFieldModalUpdate()"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">変更</a>
-                                </li>
-                                <li>
-                                    <a id="field_delete" href="#" onclick="openFieldModalDelete()"
-                                        class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">削除</a>
-                                </li>
-                            </ul>
+                            <button onclick="openFilterModal()"><i class="text-sm fa-solid fa-filter text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　絞り込み</i></button>
+                            <button id="settings_button" onclick="openModal()"><i
+                                    class="text-sm fa-solid fa-eye text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示設定</i></button>
+                            {{-- <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown"
+                                class="text-white bg-blue-500 hover:bg-blue-700 rounded text-sm px-4 py-2 text-center inline-flex items-center"
+                                type="button"><strong>フィールド設定　 </strong><i
+                                    class="ml-2 fa-solid fa-circle-chevron-down"></i>
+                            </button> --}}
+                            <div id="dropdown"
+                                class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200"
+                                    aria-labelledby="dropdownDefaultButton">
+                                    <li>
+                                        <a id="field_update" href="#" onclick="openFieldModalUpdate()"
+                                            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">変更</a>
+                                    </li>
+                                    <li>
+                                        <a id="field_delete" href="#" onclick="openFieldModalDelete()"
+                                            class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">削除</a>
+                                    </li>
+                                </ul>
+                            </div>
+                            @if($user->role == 'nl_admin')
+                            <button id="company_setting_button" onclick="openCompanyModal()">
+                                <i class="text-sm fa-solid fa-key text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示企業設定</i>
+                            </button>
+                            <button id="delete_button" onclick="confirmDelete()">
+                                <i class="text-sm fa-solid fa-trash text-white bg-red-500 hover:bg-red-700 py-2 px-4 rounded">　削除</i>
+                            </button>
+                            @endif
                         </div>
-                        @if($user->role == 'nl_admin')
-                        <button id="company_setting_button" onclick="openCompanyModal()">
-                            <i class="text-sm fa-solid fa-key text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　表示企業設定</i>
-                        </button>
-                        <button id="delete_button" onclick="confirmDelete()">
-                            <i class="text-sm fa-solid fa-trash text-white bg-red-500 hover:bg-red-700 py-2 px-4 rounded">　削除</i>
-                        </button>
-                        @endif
                     </div>
 
                     <div class="overflow-scroll !h-[650px]">
@@ -927,6 +930,7 @@
     <script>
         function calledChanges(rowIndex, colIndex) {
             if (!confirm("電話をかけてもいいですか？")) {
+                event.preventDefault();
                 return;
             }
             const id = "{{ $id }}";
