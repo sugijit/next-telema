@@ -3,11 +3,11 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
-                    <h2 class="font-semibold text-xl text-gray-800 leading-tight mb-6">新規企業追加</h2>
+                    <h2 class="font-semibold text-xl text-gray-800 leading-tight mb-6">代理店追加</h2>
                     <form action="{{ route('companies.store') }}" method="POST">
                         @csrf
                         <div class="mb-4">
-                            <label for="name" class="block text-gray-700">企業名:</label>
+                            <label for="name" class="block text-gray-700">代理店名:</label>
                             <input type="text" name="name" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700" required>
                         </div>
                         <div class="mb-4">

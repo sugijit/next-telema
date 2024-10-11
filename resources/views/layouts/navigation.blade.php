@@ -25,7 +25,7 @@
                     @endif
                     @if(Auth::user()->role === 'nl_admin')
                         <x-nav-link :href="route('companies.index')" :active="request()->routeIs('companies.index','companies.edit','companies.create','companies.show')">
-                            <strong>{{ __('登録企業') }}</strong>
+                            <strong>{{ __('代理店管理') }}</strong>
                         </x-nav-link>
                     @endif
                 </div>

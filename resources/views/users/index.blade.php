@@ -20,7 +20,7 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">会社名</th>
+                                <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">代理店名</th>
                                 <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">ID</th>
                                 <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">名前</th>
                                 <th class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider">メール</th>
