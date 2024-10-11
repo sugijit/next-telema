@@ -176,32 +176,34 @@
                 <div class="grid grid-cols-3 gap-x-16">
                     <input type="text" value={{ $id }} class="hidden" name="product_id">
                     @foreach ($hard_header as $key => $head)
-                        <div class="mb-1 flex text-xs">
-                            <label class="block text-sm font-medium min-w-[120px]">{{ $head }}</label>
-                            <div class="flex modal">
-                                {{-- switch --}}
-                                <label class="switch">
-                                    <input type="hidden" name="{{ $key }}" value="0">
-                                    <input name="{{ $key }}" type="checkbox" value="1" {{ isset($view_settings[$key]) && $view_settings[$key] == 1 ? 'checked' : '' }} 
-                                    onchange="this.previousElementSibling.value = this.checked ? 1 : 0;">
-                                    <div class="slider">
-                                        <div class="circle">
-                                            <svg class="cross" xml:space="preserve" style="enable-background:new 0 0 512 512" viewBox="0 0 365.696 365.696" y="0" x="0" height="6" width="6" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                                                <g>
-                                                    <path data-original="#000000" fill="currentColor" d="M243.188 182.86 356.32 69.726c12.5-12.5 12.5-32.766 0-45.247L341.238 9.398c-12.504-12.503-32.77-12.503-45.25 0L182.86 122.528 69.727 9.374c-12.5-12.5-32.766-12.5-45.247 0L9.375 24.457c-12.5 12.504-12.5 32.77 0 45.25l113.152 113.152L9.398 295.99c-12.503 12.503-12.503 32.769 0 45.25L24.48 356.32c12.5 12.5 32.766 12.5 45.247 0l113.132-113.132L295.99 356.32c12.503 12.5 32.769 12.5 45.25 0l15.081-15.082c12.5-12.504 12.5-32.77 0-45.25zm0 0"></path>
-                                                </g>
-                                            </svg>
-                                            <svg class="checkmark" xml:space="preserve" style="enable-background:new 0 0 512 512" viewBox="0 0 24 24" y="0" x="0" height="10" width="10" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                                                <g>
-                                                    <path class="" data-original="#000000" fill="currentColor" d="M9.707 19.121a.997.997 0 0 1-1.414 0l-5.646-5.647a1.5 1.5 0 0 1 0-2.121l.707-.707a1.5 1.5 0 0 1 2.121 0L9 14.171l9.525-9.525a1.5 1.5 0 0 1 2.121 0l.707.707a1.5 1.5 0 0 1 0 2.121z"></path>
-                                                </g>
-                                            </svg>
+                        @if($head !== "id") 
+                            <div class="mb-1 flex text-xs">
+                                <label class="block text-sm font-medium min-w-[120px]">{{ $head }}</label>
+                                <div class="flex modal">
+                                    {{-- switch --}}
+                                    <label class="switch">
+                                        <input type="hidden" name="{{ $key }}" value="0">
+                                        <input name="{{ $key }}" type="checkbox" value="1" {{ isset($view_settings[$key]) && $view_settings[$key] == 1 ? 'checked' : '' }} 
+                                        onchange="this.previousElementSibling.value = this.checked ? 1 : 0;">
+                                        <div class="slider">
+                                            <div class="circle">
+                                                <svg class="cross" xml:space="preserve" style="enable-background:new 0 0 512 512" viewBox="0 0 365.696 365.696" y="0" x="0" height="6" width="6" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                                                    <g>
+                                                        <path data-original="#000000" fill="currentColor" d="M243.188 182.86 356.32 69.726c12.5-12.5 12.5-32.766 0-45.247L341.238 9.398c-12.504-12.503-32.77-12.503-45.25 0L182.86 122.528 69.727 9.374c-12.5-12.5-32.766-12.5-45.247 0L9.375 24.457c-12.5 12.504-12.5 32.77 0 45.25l113.152 113.152L9.398 295.99c-12.503 12.503-12.503 32.769 0 45.25L24.48 356.32c12.5 12.5 32.766 12.5 45.247 0l113.132-113.132L295.99 356.32c12.503 12.5 32.769 12.5 45.25 0l15.081-15.082c12.5-12.504 12.5-32.77 0-45.25zm0 0"></path>
+                                                    </g>
+                                                </svg>
+                                                <svg class="checkmark" xml:space="preserve" style="enable-background:new 0 0 512 512" viewBox="0 0 24 24" y="0" x="0" height="10" width="10" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                                                    <g>
+                                                        <path class="" data-original="#000000" fill="currentColor" d="M9.707 19.121a.997.997 0 0 1-1.414 0l-5.646-5.647a1.5 1.5 0 0 1 0-2.121l.707-.707a1.5 1.5 0 0 1 2.121 0L9 14.171l9.525-9.525a1.5 1.5 0 0 1 2.121 0l.707.707a1.5 1.5 0 0 1 0 2.121z"></path>
+                                                    </g>
+                                                </svg>
+                                            </div>
                                         </div>
-                                    </div>
-                                </label>
-                                {{-- switch end --}}
+                                    </label>
+                                    {{-- switch end --}}
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     @endforeach
                 </div>
                 <div class="text-center text-sm mt-8">
@@ -384,7 +386,7 @@
             class="text-xl absolute top-3 right-6 text-gray-500 hover:text-gray-700">
             <i class="fa-solid fa-xmark"></i>
         </button>
-        <h2 class="text-sm font-bold mt-3 !mb-3 border-b pb-3 text-gray-600">フィールド変更</h2>
+        <h2 class="text-sm font-bold mt-3 !mb-3 border-b pb-3 text-gray-600">リスト表示可能な代理店</h2>
         <form id="settingsFieldForm" action="{{ route('product.updateCompanies') }}" method="POST">
             @csrf
             <input type="text" value={{ $id }} class="hidden" name="product_id">
@@ -588,7 +590,7 @@
                                                     @endphp
 
                                                     @if ($isValidPhoneNumber)
-                                                        <a class="" id="editable-phone-{{ $rowIndex }}-{{ $colIndex }}" onclick="calledChanges({{ $rowIndex }}, '{{ $colIndex }}')"
+                                                        <a class="" id="editable-phone-{{ $list_item['id'] }}-{{ $colIndex }}" onclick="calledChanges({{ $list_item['id'] }}, '{{ $colIndex }}')"
                                                             href="tel:{{ $value }}" >{{ $value == null ? '-' : $value }}</a>
                                                     @else
                                                         @if (($colIndex === 'created_at' || $colIndex === 'updated_at') && $value != null)
@@ -630,10 +632,10 @@
                                                             @if (array_key_exists($key, $fieldss))
                                                                 @if ($valuee === 'select')
                                                                     <select
-                                                                        id="editable-select-{{ $rowIndex }}-{{ $colIndex }}"
+                                                                        id="editable-select-{{ $list_item['id'] }}-{{ $colIndex }}"
                                                                         class="!text-xs block appearance-none min-w-28 w-full bg-white border border-gray-400 hover:border-gray-500 px-2 py-1 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
                                                                         value="{{ $value }}"
-                                                                        onchange="saveChangesSelect({{ $rowIndex }}, '{{ $colIndex }}')">
+                                                                        onchange="saveChangesSelect({{ $list_item['id'] }}, '{{ $colIndex }}')">
                                                                         @if (isset($fieldss["options_{$prim}"]))
                                                                             <option value=""></option>
                                                                             @if($key == 'field_type_2' && $user->role == 'user')
@@ -704,17 +706,17 @@
                                                                         {{ $value == null ? '-' : $value }}
                                                                     </div>
                                                                 @elseif($valuee == 'textarea')
-                                                                    <div id="editable-text-{{ $rowIndex }}-{{ $colIndex }}"
+                                                                    <div id="editable-text-{{ $list_item['id'] }}-{{ $colIndex }}"
                                                                         class="editable p-0 min-w-32 max-w-42 text-wrap"
-                                                                        onclick="makeEditable({{ $rowIndex }}, '{{ $colIndex }}')">
+                                                                        onclick="makeEditable({{ $list_item['id'] }}, '{{ $colIndex }}')">
                                                                         {{ $value == null ? '-' : $value }}
                                                                     </div>
 
                                                                     <textarea class="text-xs px-2 py-1 max-w-[250px] h-32 resize-none"
-                                                                    id="editable-input-{{ $rowIndex }}-{{ $colIndex }}"
+                                                                    id="editable-input-{{ $list_item['id'] }}-{{ $colIndex }}"
                                                                     style="display:none;"
-                                                                    onblur="saveChanges({{ $rowIndex }}, '{{ $colIndex }}')"
-                                                                    onkeydown="handleKeyDown(event, {{ $rowIndex }}, '{{ $colIndex }})">{{ $value }}</textarea>
+                                                                    onblur="saveChanges({{ $list_item['id'] }}, '{{ $colIndex }}')"
+                                                                    onkeydown="handleKeyDown(event, {{ $list_item['id'] }}, '{{ $colIndex }}')">{{ $value }}</textarea>
                                                           
                                                                 @else
                                                                     <div class="editable p-0">

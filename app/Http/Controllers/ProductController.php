@@ -470,6 +470,7 @@ class ProductController extends Controller
     {
         try {
             $rowIndex = $request->input('rowIndex');
+            $rowIndex = $rowIndex - 1;
             $colIndex = $request->input('colIndex');
             $value = $request->input('value');
             $productId = $request->input('id');
@@ -1042,6 +1043,7 @@ class ProductController extends Controller
         public function calledChange(Request $request){
             try {
                 $rowIndex = $request->input('rowIndex');
+                $rowIndex = $rowIndex - 1;
                 $colIndex = $request->input('colIndex');
                 $user_name = $request->input('user_name');
                 $productId = $request->input('id');
