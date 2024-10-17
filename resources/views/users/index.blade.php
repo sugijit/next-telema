@@ -37,7 +37,13 @@
                                     <td class="px-6 py-2 whitespace-nowrap text-sm">{{ $userr->user_cd }}</td>
                                     <td class="px-6 py-2 whitespace-nowrap text-sm">{{ $userr->name }}</td>
                                     <td class="px-6 py-2 whitespace-nowrap text-sm">{{ $userr->email }}</td>
-                                    <td class="px-6 py-2 whitespace-nowrap text-xs">{{ ($userr->role === 'admin') ? '管理者' : '一般ユーザー' }}</td>
+                                    @if ($userr->role === 'nl_admin') 
+                                        <td class="px-6 py-2 whitespace-nowrap text-xs">シス管理者</td>
+                                    @elseif($userr->role === 'admin')
+                                        <td class="px-6 py-2 whitespace-nowrap text-xs">管理者</td>
+                                    @else
+                                        <td class="px-6 py-2 whitespace-nowrap text-xs">一般ユーザー</td>
+                                    @endif
                                     @if($user->role == 'nl_admin')
                                         <td class="px-6 py-2 whitespace-nowrap text-xs font-medium">
                                             <a href="{{ route('users.edit', $userr) }}" class="text-indigo-600 hover:text-indigo-900 mr-3">変更</a>
