@@ -567,7 +567,9 @@
                         
                         
                         <div class="mb-4 flex justify-end gap-3">
-                            {{-- <button onclick="downloadCSV()" ><i class="text-sm fa-solid fa-download text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded">　ダウンロード</i></button> --}}
+                            {{-- @if ($user->role === "nl_admin")
+                                <button onclick="downloadCSV()" ><i class="text-sm fa-solid fa-download text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded">　ダウンロード</i></button>
+                            @endif --}}
 
                             <button onclick="openFilterModal()"><i class="text-sm fa-solid fa-filter text-white bg-blue-500 hover:bg-blue-700 py-2 px-4 rounded">　絞り込み</i></button>
                             <button id="settings_button" onclick="openModal()"><i
