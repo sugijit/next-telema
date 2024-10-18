@@ -509,7 +509,63 @@
 
                 <div class="p-6 !pt-0 bg-white border-b border-gray-200">
                     <div class="flex justify-between items-center">
-                        <div>獲得数：{{$got_count}}件</div>
+
+                        <div class="flex gap-6">
+                            <table class="mb-4 bg-white text-xs border-2 border-blue-200 rounded-lg">
+                                <thead>
+                                    <tr class="bg-blue-100 text-left text-gray-600 uppercase tracking-wider">
+                                        <th class="px-4 py-1">項目</th>
+                                        <th class="px-4 py-1">本日</th>
+                                        <th class="px-4 py-1">今月</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-t-2 border-blue-200">
+                                        <td class="px-4 py-1 bg-blue-100">私</td>
+                                        <td class="px-4 py-1">{{$got_count[$user->role]["user_today"]}}件</td>
+                                        <td class="px-4 py-1">{{$got_count[$user->role]["user_this_month"]}}件</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            @if ($user->role !== "user")
+                            <table class="mb-4 bg-white text-xs border border-gray-200 rounded-lg">
+                                <thead>
+                                    <tr class="bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
+                                        <th class="px-4 py-1">項目</th>
+                                        <th class="px-4 py-1">本日</th>
+                                        <th class="px-4 py-1">今月</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-t">
+                                        <td class="px-4 py-1 bg-gray-100">{{$user->company->name}}</td>
+                                        <td class="px-4 py-1">{{$got_count[$user->role]["agent_today"]}}件</td>
+                                        <td class="px-4 py-1">{{$got_count[$user->role]["agent_this_month"]}}件</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            @endif
+                            @if ($user->role === "nl_admin")
+                            <table class="mb-4 bg-white text-xs border border-gray-200 rounded-lg">
+                                <thead>
+                                    <tr class="bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
+                                        <th class="px-4 py-1">項目</th>
+                                        <th class="px-4 py-1">本日</th>
+                                        <th class="px-4 py-1">今月</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-t">
+                                        <td class="px-4 py-1 bg-gray-100">全体</td>
+                                        <td class="px-4 py-1">{{$got_count[$user->role]["today"]}}件</td>
+                                        <td class="px-4 py-1">{{$got_count[$user->role]["this_month"]}}件</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            @endif
+                        </div>
+                        
+                        
                         <div class="mb-4 flex justify-end gap-3">
                             {{-- <button onclick="downloadCSV()" ><i class="text-sm fa-solid fa-download text-white bg-green-500 hover:bg-green-700 py-2 px-4 rounded">　ダウンロード</i></button> --}}
 

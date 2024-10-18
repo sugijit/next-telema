@@ -17,6 +17,7 @@ use App\Models\Company;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -179,22 +180,8 @@ class ProductController extends Controller
         $companiess = [];
         $companiess = Company::select('id', 'name')->get();
 
-        if ($user->role == 'nl_admin') {
-            $got_count = $productModel->where('telema_tel_status', '獲得')->count();
-        } elseif ($user->role == 'admin') {
-            // $company_ids = User::where('id', $user->id)->pluck('company_id')->toArray();
-            $company_user_names = User::whereIn('company_id', $company_ids)->pluck('name')->toArray();
-            $got_count = $productModel->where('telema_tel_status', '獲得')
-                ->where(function($query) use ($user, $company_user_names) {
-                    $query->where('telema_last_called_agent', $user->name)
-                          ->orWhereIn('telema_last_called_agent', $company_user_names);
-                })
-                ->count();
-        } else {
-            $got_count = $productModel->where('telema_tel_status', '獲得')->where('telema_last_called_agent',$user->name)->count();
-        }
 
-        // dd($company_ids);
+        $got_count = $this->gotCount($user, $productModel, $company_ids);
 
         return view('product.show', compact('products', 'id', 'list_items', 'header', 'current_list', 'can_views', 'view_settings', 'hard_header', 'fields', 'selectFields','user', 'selectUsers','companies', 'companiess', 'company_ids','got_count'));
     }
@@ -892,20 +879,7 @@ class ProductController extends Controller
         $productMst = ProductsMst::find($id)->get('company_id')->toArray();
         // $company_ids = json_decode($productMst[0]["company_id"], true);
 
-        if ($user->role == 'nl_admin') {
-            $got_count = $modelClass->where('telema_tel_status', '獲得')->count();
-        } elseif ($user->role == 'admin') {
-            // $company_ids = User::where('id', $user->id)->pluck('company_id')->toArray();
-            $company_user_names = User::whereIn('company_id', $company_ids)->pluck('name')->toArray();
-            $got_count = $modelClass->where('telema_tel_status', '獲得')
-                ->where(function($query) use ($user, $company_user_names) {
-                    $query->where('telema_last_called_agent', $user->name)
-                          ->orWhereIn('telema_last_called_agent', $company_user_names);
-                })
-                ->count();
-        } else {
-            $got_count = $modelClass->where('telema_tel_status', '獲得')->where('telema_last_called_agent',$user->name)->count();
-        }
+        $got_count = $this->gotCount($user, $modelClass, $company_ids);
 
 
 
@@ -1085,6 +1059,271 @@ class ProductController extends Controller
             // showへリダイレクト
             return redirect()->route('products.show', $product_id)
             ->with('success', "表示企業を保存しました");
+        }
+
+        public function gotCount ($user, $productModel, $company_ids) {
+            $nl_admin = [];
+            $admin = [];
+            $userr = [];
+            if ($user->role == 'nl_admin') {
+                //ずべて
+                $all_count = $productModel->where('telema_tel_status', '獲得')->count();
+                $today_count = $productModel->where('telema_tel_status', '獲得')
+                                ->whereDate('updated_at', Carbon::today())
+                                ->count();
+                // 今月の獲得数
+                $this_month_count = $productModel->where('telema_tel_status', '獲得')
+                    ->whereYear('updated_at', Carbon::now()->year)
+                    ->whereMonth('updated_at', Carbon::now()->month)
+                    ->count();
+
+                // 先月の獲得数
+                $last_month = Carbon::now()->subMonth();
+                $last_month_count = $productModel->where('telema_tel_status', '獲得')
+                    ->whereYear('updated_at', $last_month->year)
+                    ->whereMonth('updated_at', $last_month->month)
+                    ->count();
+                // 今年の獲得数
+                $this_year_count = $productModel->where('telema_tel_status', '獲得')
+                    ->whereYear('updated_at', Carbon::now()->year)
+                    ->count();
+                
+                //自分の総数
+                $user_all_count = $productModel->where('telema_tel_status', '獲得')->where('telema_last_called_agent',$user->name)->count();
+                // 今日の獲得数
+                $user_today_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where('telema_last_called_agent', $user->name)
+                    ->whereDate('updated_at', Carbon::today())
+                    ->count();
+
+                // 今月の獲得数
+                $user_this_month_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where('telema_last_called_agent', $user->name)
+                    ->whereYear('updated_at', Carbon::now()->year)
+                    ->whereMonth('updated_at', Carbon::now()->month)
+                    ->count();
+
+                // 先月の獲得数
+                $last_month = Carbon::now()->subMonth();
+                $user_last_month_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where('telema_last_called_agent', $user->name)
+                    ->whereYear('updated_at', $last_month->year)
+                    ->whereMonth('updated_at', $last_month->month)
+                    ->count();
+
+                // 今年の獲得数
+                $user_this_year_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where('telema_last_called_agent', $user->name)
+                    ->whereYear('updated_at', Carbon::now()->year)
+                    ->count();
+
+                $company_idss = [$user->company_id];
+                $company_user_names = User::whereIn('company_id', $company_idss)->pluck('name')->toArray();
+                $agent_all_count = $productModel->where('telema_tel_status', '獲得')
+                ->where(function($query) use ($user, $company_user_names) {
+                    $query->where('telema_last_called_agent', $user->name)
+                    ->orWhereIn('telema_last_called_agent', $company_user_names);
+                })
+                ->count();
+                // dd($agent_all_count);
+
+                // 今日の獲得数
+                $agent_today_count = $productModel->where('telema_tel_status', '獲得')
+                ->where(function($query) use ($user, $company_user_names) {
+                    $query->where('telema_last_called_agent', $user->name)
+                        ->orWhereIn('telema_last_called_agent', $company_user_names);
+                })
+                ->whereDate('updated_at', Carbon::today())
+                ->count();
+
+                // 今月の獲得数
+                $agent_this_month_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where(function($query) use ($user, $company_user_names) {
+                        $query->where('telema_last_called_agent', $user->name)
+                            ->orWhereIn('telema_last_called_agent', $company_user_names);
+                    })
+                    ->whereYear('updated_at', Carbon::now()->year)
+                    ->whereMonth('updated_at', Carbon::now()->month)
+                    ->count();
+
+                // 先月の獲得数
+                $last_month = Carbon::now()->subMonth();
+                $agent_last_month_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where(function($query) use ($user, $company_user_names) {
+                        $query->where('telema_last_called_agent', $user->name)
+                            ->orWhereIn('telema_last_called_agent', $company_user_names);
+                    })
+                    ->whereYear('updated_at', $last_month->year)
+                    ->whereMonth('updated_at', $last_month->month)
+                    ->count();
+
+                // 今年の獲得数
+                $agent_this_year_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where(function($query) use ($user, $company_user_names) {
+                        $query->where('telema_last_called_agent', $user->name)
+                            ->orWhereIn('telema_last_called_agent', $company_user_names);
+                    })
+                    ->whereYear('updated_at', Carbon::now()->year)
+                    ->count();
+                $nl_admin = [
+                    "all" => $all_count,
+                    "today" => $today_count,
+                    "this_month" => $this_month_count,
+                    "last_month" => $last_month_count,
+                    "this_year" => $this_year_count,
+                    "user_all" => $user_all_count,
+                    "user_today" => $user_today_count,
+                    "user_this_month" => $user_this_month_count,
+                    "user_last_month" => $user_last_month_count,
+                    "user_this_year" => $user_this_year_count,
+                    "agent_all" => $agent_all_count,
+                    "agent_today" => $agent_today_count,
+                    "agent_this_month" => $agent_this_month_count,
+                    "agent_last_month" => $agent_last_month_count,
+                    "agent_this_year" => $agent_this_year_count,    
+                ];
+            } elseif ($user->role == 'admin') {
+                //自分の会社の総数
+                $company_ids = [$user->company_id];
+                // dd($company_ids);
+                $company_user_names = User::whereIn('company_id', $company_ids)->pluck('name')->toArray();
+                // dd($company_user_names);
+                $agent_all_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where(function($query) use ($user, $company_user_names) {
+                        $query->where('telema_last_called_agent', $user->name)
+                              ->orWhereIn('telema_last_called_agent', $company_user_names);
+                    })
+                    ->count();
+
+                // 今日の獲得数
+                $agent_today_count = $productModel->where('telema_tel_status', '獲得')
+                ->where(function($query) use ($user, $company_user_names) {
+                    $query->where('telema_last_called_agent', $user->name)
+                        ->orWhereIn('telema_last_called_agent', $company_user_names);
+                })
+                ->whereDate('updated_at', Carbon::today())
+                ->count();
+
+
+                // 今月の獲得数
+                $agent_this_month_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where(function($query) use ($user, $company_user_names) {
+                        $query->where('telema_last_called_agent', $user->name)
+                            ->orWhereIn('telema_last_called_agent', $company_user_names);
+                    })
+                    ->whereYear('updated_at', Carbon::now()->year)
+                    ->whereMonth('updated_at', Carbon::now()->month)
+                    ->count();
+
+                // 先月の獲得数
+                $last_month = Carbon::now()->subMonth();
+                $agent_last_month_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where(function($query) use ($user, $company_user_names) {
+                        $query->where('telema_last_called_agent', $user->name)
+                            ->orWhereIn('telema_last_called_agent', $company_user_names);
+                    })
+                    ->whereYear('updated_at', $last_month->year)
+                    ->whereMonth('updated_at', $last_month->month)
+                    ->count();
+
+                // 今年の獲得数
+                $agent_this_year_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where(function($query) use ($user, $company_user_names) {
+                        $query->where('telema_last_called_agent', $user->name)
+                            ->orWhereIn('telema_last_called_agent', $company_user_names);
+                    })
+                    ->whereYear('updated_at', Carbon::now()->year)
+                    ->count();
+
+                 //自分の総数
+                 $user_all_count = $productModel->where('telema_tel_status', '獲得')->where('telema_last_called_agent',$user->name)->count();
+                 // 今日の獲得数
+                 $user_today_count = $productModel->where('telema_tel_status', '獲得')
+                     ->where('telema_last_called_agent', $user->name)
+                     ->whereDate('updated_at', Carbon::today())
+                     ->count();
+ 
+                 // 今月の獲得数
+                 $user_this_month_count = $productModel->where('telema_tel_status', '獲得')
+                     ->where('telema_last_called_agent', $user->name)
+                     ->whereYear('updated_at', Carbon::now()->year)
+                     ->whereMonth('updated_at', Carbon::now()->month)
+                     ->count();
+ 
+                 // 先月の獲得数
+                 $last_month = Carbon::now()->subMonth();
+                 $user_last_month_count = $productModel->where('telema_tel_status', '獲得')
+                     ->where('telema_last_called_agent', $user->name)
+                     ->whereYear('updated_at', $last_month->year)
+                     ->whereMonth('updated_at', $last_month->month)
+                     ->count();
+ 
+                 // 今年の獲得数
+                 $user_this_year_count = $productModel->where('telema_tel_status', '獲得')
+                     ->where('telema_last_called_agent', $user->name)
+                     ->whereYear('updated_at', Carbon::now()->year)
+                     ->count();
+
+                
+                $admin = [
+                    "agent_all" => $agent_all_count,
+                    "agent_today" => $agent_today_count,
+                    "agent_this_month" => $agent_this_month_count,
+                    "agent_last_month" => $agent_last_month_count,
+                    "agent_this_year" => $agent_this_year_count,
+                    "user_all" => $user_all_count,
+                    "user_today" => $user_today_count,
+                    "user_this_month" => $user_this_month_count,
+                    "user_last_month" => $user_last_month_count,
+                    "user_this_year" => $user_this_year_count,    
+                ];
+            } else {
+                //自分の総数
+                $user_all_count = $productModel->where('telema_tel_status', '獲得')->where('telema_last_called_agent',$user->name)->count();
+                // 今日の獲得数
+                $user_today_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where('telema_last_called_agent', $user->name)
+                    ->whereDate('updated_at', Carbon::today())
+                    ->count();
+
+                // 今月の獲得数
+                $user_this_month_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where('telema_last_called_agent', $user->name)
+                    ->whereYear('updated_at', Carbon::now()->year)
+                    ->whereMonth('updated_at', Carbon::now()->month)
+                    ->count();
+
+                // 先月の獲得数
+                $last_month = Carbon::now()->subMonth();
+                $user_last_month_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where('telema_last_called_agent', $user->name)
+                    ->whereYear('updated_at', $last_month->year)
+                    ->whereMonth('updated_at', $last_month->month)
+                    ->count();
+
+                // 今年の獲得数
+                $user_this_year_count = $productModel->where('telema_tel_status', '獲得')
+                    ->where('telema_last_called_agent', $user->name)
+                    ->whereYear('updated_at', Carbon::now()->year)
+                    ->count();
+
+                $userr = [
+                    "user_all" => $user_all_count,
+                    "user_today" => $user_today_count,
+                    "user_this_month" => $user_this_month_count,
+                    "user_last_month" => $user_last_month_count,
+                    "user_this_year" => $user_this_year_count,  
+                ];
+
+            }
+
+            $got_count = [
+                "nl_admin" => $nl_admin,
+                "admin" => $admin,
+                "user" => $userr,
+            ];
+
+            return $got_count;
         }
 
 }
