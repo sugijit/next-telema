@@ -514,7 +514,7 @@
                             <table class="mb-4 bg-white text-xs border-2 border-blue-200 rounded-lg">
                                 <thead>
                                     <tr class="bg-blue-100 text-left text-gray-600 uppercase tracking-wider">
-                                        <th class="px-4 py-1">項目</th>
+                                        <th class="px-4 py-1"></th>
                                         <th class="px-4 py-1">本日</th>
                                         <th class="px-4 py-1">今月</th>
                                     </tr>
@@ -531,7 +531,7 @@
                             <table class="mb-4 bg-white text-xs border border-gray-200 rounded-lg">
                                 <thead>
                                     <tr class="bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
-                                        <th class="px-4 py-1">項目</th>
+                                        <th class="px-4 py-1"></th>
                                         <th class="px-4 py-1">本日</th>
                                         <th class="px-4 py-1">今月</th>
                                     </tr>
@@ -549,7 +549,7 @@
                             <table class="mb-4 bg-white text-xs border border-gray-200 rounded-lg">
                                 <thead>
                                     <tr class="bg-gray-100 text-left text-gray-600 uppercase tracking-wider">
-                                        <th class="px-4 py-1">項目</th>
+                                        <th class="px-4 py-1"></th>
                                         <th class="px-4 py-1">本日</th>
                                         <th class="px-4 py-1">今月</th>
                                     </tr>
